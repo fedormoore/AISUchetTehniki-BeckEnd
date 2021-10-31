@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.moore.AISUchetTehniki.exeptions.ErrorTemplate;
 import ru.moore.AISUchetTehniki.exeptions.TemplateMessage;
 import ru.moore.AISUchetTehniki.security.SignUpDto;
 import ru.moore.AISUchetTehniki.models.Entity.spr.User;
@@ -76,18 +77,17 @@ public class AuthService implements UserDetailsService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
         } catch (BadCredentialsException ex) {
-            return new ResponseEntity<>(new TemplateMessage(HttpStatus.UNAUTHORIZED.value(), "Ошбика","Неверный логин или пароль!"), HttpStatus.UNAUTHORIZED);
+            throw new ErrorTemplate(HttpStatus.NOT_FOUND, "Неверный логин или пароль!");
         }
 
         User user = userRepository.findByEmail(login).get();
 
         if (!user.isConfirmation()) {
-            return new ResponseEntity<>(new TemplateMessage(HttpStatus.UNAUTHORIZED.value(), "Ошбика","Учетная запись не активирована!"), HttpStatus.UNAUTHORIZED);
-            //throw new RecordExistsException("Ошибка", "Учетная запись не активирована!");
+            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Учетная запись не активирована!");
         }
 
         String token = jwtTokenUtil.generateToken(user);
-        return ResponseEntity.ok(new JwtResponse(token));
+        return new ResponseEntity<>(new JwtResponse(token), HttpStatus.OK);
     }
 
     @Override
