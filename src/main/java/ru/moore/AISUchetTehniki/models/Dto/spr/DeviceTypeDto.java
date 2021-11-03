@@ -1,22 +1,16 @@
 package ru.moore.AISUchetTehniki.models.Dto.spr;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class LocationDto {
+public class DeviceTypeDto {
 
     private Long id;
-    private String type;
     private String name;
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<LocationDto> locations;
 
     private LocalDateTime createdAt;
 

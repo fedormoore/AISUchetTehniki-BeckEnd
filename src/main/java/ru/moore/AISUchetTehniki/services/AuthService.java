@@ -17,7 +17,7 @@ import ru.moore.AISUchetTehniki.exeptions.ErrorTemplate;
 import ru.moore.AISUchetTehniki.exeptions.TemplateMessage;
 import ru.moore.AISUchetTehniki.security.SignUpDto;
 import ru.moore.AISUchetTehniki.models.Entity.spr.User;
-import ru.moore.AISUchetTehniki.repositories.OrganizationRepository;
+import ru.moore.AISUchetTehniki.repositories.spr.OrganizationRepository;
 import ru.moore.AISUchetTehniki.repositories.spr.UserRepository;
 import ru.moore.AISUchetTehniki.security.JwtResponse;
 import ru.moore.AISUchetTehniki.security.JwtTokenUtil;

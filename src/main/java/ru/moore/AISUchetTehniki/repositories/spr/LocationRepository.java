@@ -9,5 +9,4 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 
     List<Location> findByType(String country);
 
-    List<Location> findAllByLocationId(Long id);
 }
