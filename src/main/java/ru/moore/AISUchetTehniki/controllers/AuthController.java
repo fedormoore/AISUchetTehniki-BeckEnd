@@ -8,7 +8,7 @@ import ru.moore.AISUchetTehniki.security.SignUpDto;
 import ru.moore.AISUchetTehniki.security.SignInDto;
 import ru.moore.AISUchetTehniki.services.AuthService;
 
-@CrossOrigin(origins = {"http://localhost:3000", "http://172.16.3.120:3000"})
+@CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor

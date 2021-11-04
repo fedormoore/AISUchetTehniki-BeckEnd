@@ -1,7 +1,5 @@
 package ru.moore.AISUchetTehniki.models.Entity.spr;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,32 +9,24 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "spr_location")
-public class Location {
+@Table(name = "spr_firm")
+public class Firm {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "type")
-    private String type;
-
     @Column(name = "name")
     private String name;
 
-    @ManyToOne()
-    @JoinColumn(name="parent")
-    private LocationParent parent;
-
-    @OneToMany(mappedBy = "parent")
-    private List<Location> child;
+    @Column(name = "level")
+    private String level = "Local";
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -53,4 +43,6 @@ public class Location {
     @JoinColumn(name="organization_id")
     private Organization organization;
 
+    @OneToMany(mappedBy = "firm")
+    private List<Model> models;
 }
