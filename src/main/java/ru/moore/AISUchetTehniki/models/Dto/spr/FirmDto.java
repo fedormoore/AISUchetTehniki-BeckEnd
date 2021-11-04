@@ -1,0 +1,18 @@
+package ru.moore.AISUchetTehniki.models.Dto.spr;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Data
+@NoArgsConstructor
+public class FirmDto {
+
+    private Long id;
+    private String name;
+    private String level;
+
+    private LocalDateTime createdAt;
+
+}
