@@ -24,6 +24,9 @@ public class DeviceType {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "level")
+    private String level = "Local";
+
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;

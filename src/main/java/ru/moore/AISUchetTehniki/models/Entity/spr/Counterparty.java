@@ -25,13 +25,13 @@ public class Counterparty {
     private String name;
 
     @Column(name = "inn")
-    private Integer inn;
+    private String inn;
 
     @Column(name = "telephone")
     private String telephone;
 
-    @Column(name = "mail")
-    private String mail;
+    @Column(name = "email")
+    private String email;
 
     @Column(name = "contact")
     private String contact;

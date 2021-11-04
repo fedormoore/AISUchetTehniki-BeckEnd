@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class FirmDto {
+public class LocationParentDto {
 
     private Long id;
+    private String type;
     private String name;
-    private String level;
 
     private LocalDateTime createdAt;
 

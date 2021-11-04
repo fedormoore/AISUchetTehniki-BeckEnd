@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface DeviceTypeRepository extends JpaRepository<DeviceType, Long> {
 
-    List<DeviceType> findByOrderByIdAsc();
+    Optional<DeviceType> findByName(String name);
 
-    Optional<DeviceType> findByNameOrderByIdAsc(String name);
+    List<DeviceType> findAllByLevelOrOrganizationIdOrderByNameAsc(String global, Long organizationId);
 }

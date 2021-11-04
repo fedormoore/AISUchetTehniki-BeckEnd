@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface CounterpartyRepository extends JpaRepository<Counterparty, Long> {
 
-    List<Counterparty> findAllByOrderByIdAsc();
+    List<Counterparty> findAllByOrganizationIdOrderByNameAsc(Long organizationId);
 
-    Optional<Counterparty> findByNameOrderByIdAsc(String name);
+    Optional<Counterparty> findByNameAndOrganizationId(String name, Long organizationId);
 }

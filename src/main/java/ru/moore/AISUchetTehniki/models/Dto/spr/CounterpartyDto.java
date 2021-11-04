@@ -11,9 +11,9 @@ public class CounterpartyDto {
 
     private Long id;
     private String name;
-    private Integer inn;
+    private String inn;
     private String telephone;
-    private String mail;
+    private String email;
     private String contact;
 
     private LocalDateTime createdAt;

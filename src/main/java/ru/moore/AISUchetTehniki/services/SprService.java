@@ -1,6 +1,7 @@
 package ru.moore.AISUchetTehniki.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -25,25 +26,33 @@ public class SprService {
     private final CounterpartyRepository providerRepository;
     private final MapperUtils mapperUtils;
 
+    private Long getOrganizationId(Authentication authentication) {
+        return ((UserPrincipal) authentication.getPrincipal()).getOrganization_id();
+    }
+
     private Organization getOrganization(Authentication authentication) {
-        Organization organization = Organization.builder()
+        return Organization.builder()
                 .id(((UserPrincipal) authentication.getPrincipal()).getOrganization_id())
                 .build();
-        return organization;
     }
 
     public List<LocationDto> getAllLocation(Authentication authentication) {
-        return mapperUtils.mapAll(locationRepository.findByType("country"), LocationDto.class);
+        return mapperUtils.mapAll(locationRepository.findAllByTypeAndOrganizationIdOrderByNameDesc("country", getOrganizationId(authentication)), LocationDto.class);
     }
 
     public List<LocationDto> saveLocation(Authentication authentication, Location location) {
         location.setOrganization(getOrganization(authentication));
+
+        locationRepository.findByTypeAndNameAndOrganizationId(location.getType(), location.getName(), getOrganizationId(authentication)).ifPresent(value -> {
+            if (!value.getId().equals(location.getId())) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
+        });
+
         mapperUtils.map(locationRepository.save(location), LocationDto.class);
-        return mapperUtils.mapAll(locationRepository.findByType("country"), LocationDto.class);
+        return mapperUtils.mapAll(locationRepository.findAllByTypeAndOrganizationIdOrderByNameDesc("country", getOrganizationId(authentication)), LocationDto.class);
     }
 
     public List<UserDto> getAllUser(Authentication authentication) {
-        return mapperUtils.mapAll(userRepository.findAll(), UserDto.class);
+        return mapperUtils.mapAll(userRepository.findAllByOrganizationId(getOrganizationId(authentication)), UserDto.class);
     }
 
     public UserDto saveUser(Authentication authentication, User userIn) {
@@ -64,26 +73,30 @@ public class SprService {
     }
 
     public List<DeviceTypeDto> getAllDeviceType(Authentication authentication) {
-        return mapperUtils.mapAll(deviceTypeRepository.findByOrderByIdAsc(), DeviceTypeDto.class);
+        return mapperUtils.mapAll(deviceTypeRepository.findAllByLevelOrOrganizationIdOrderByNameAsc("Global", getOrganizationId(authentication)), DeviceTypeDto.class);
     }
 
     public DeviceTypeDto saveDeviceType(Authentication authentication, DeviceType deviceType) {
-        deviceTypeRepository.findByNameOrderByIdAsc(deviceType.getName()).ifPresent(value -> {
-            if (value.getId() != deviceType.getId()) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
+        deviceTypeRepository.findByName(deviceType.getName()).ifPresent(value -> {
+            if (!value.getId().equals(deviceType.getId())) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
         });
 
         deviceType.setOrganization(getOrganization(authentication));
 
-        return mapperUtils.map(deviceTypeRepository.save(deviceType), DeviceTypeDto.class);
+        try {
+            return mapperUtils.map(deviceTypeRepository.save(deviceType), DeviceTypeDto.class);
+        }catch (DataIntegrityViolationException ex){
+            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, ex.getRootCause().getMessage());
+        }
     }
 
     public List<FirmDto> getAllFirm(Authentication authentication) {
-        return mapperUtils.mapAll(firmRepository.findByOrderByIdDesc(), FirmDto.class);
+        return mapperUtils.mapAll(firmRepository.findAllByLevelOrOrganizationIdOrderByNameAsc("Global", getOrganizationId(authentication)), FirmDto.class);
     }
 
     public FirmDto saveFirm(Authentication authentication, Firm firm) {
-        firmRepository.findByNameOrderByIdAsc(firm.getName()).ifPresent(value -> {
-            if (value.getId() != firm.getId()) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
+        firmRepository.findByName(firm.getName()).ifPresent(value -> {
+            if (!value.getId().equals(firm.getId())) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
         });
 
         firm.setOrganization(getOrganization(authentication));
@@ -96,7 +109,7 @@ public class SprService {
 //    }
 
     public List<ModelDto> getModelByFirmId(Authentication authentication, Long id) {
-        return mapperUtils.mapAll(modelRepository.findAllByFirmId(id), ModelDto.class);
+        return mapperUtils.mapAll(modelRepository.findAllByFirmIdAndOrganizationIdOrderByNameDesc(id, getOrganizationId(authentication)), ModelDto.class);
     }
 
 //    public ModelDto getModelById(Long id) {
@@ -104,32 +117,36 @@ public class SprService {
 //    }
 
     public ModelDto saveModel(Authentication authentication, Model model) {
-        modelRepository.findByNameOrderByIdAsc(model.getName()).ifPresent(value -> {
-            if (value.getId() != model.getId()) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
+        modelRepository.findByNameAndOrganizationIdAndFirmId(model.getName(), getOrganizationId(authentication), model.getFirm().getId()).ifPresent(value -> {
+            if (!value.getId().equals(model.getId())) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
         });
 
-        if (deviceTypeRepository.findByNameOrderByIdAsc(model.getDeviceType().getName()).isEmpty()) {
+        if (deviceTypeRepository.findByName(model.getDeviceType().getName()).isEmpty()) {
             DeviceType deviceType = mapperUtils.map(saveDeviceType(authentication, model.getDeviceType()), DeviceType.class);
             model.setDeviceType(deviceType);
         }
 
         model.setOrganization(getOrganization(authentication));
 
-        return mapperUtils.map(modelRepository.save(mapperUtils.map(model, Model.class)), ModelDto.class);
+        try {
+            return mapperUtils.map(modelRepository.save(mapperUtils.map(model, Model.class)), ModelDto.class);
+        }catch (DataIntegrityViolationException ex){
+            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, ex.getRootCause().getMessage());
+        }
     }
 
     public List<CounterpartyDto> getAllCounterparty(Authentication authentication) {
-        return mapperUtils.mapAll(providerRepository.findAllByOrderByIdAsc(), CounterpartyDto.class);
+        return mapperUtils.mapAll(providerRepository.findAllByOrganizationIdOrderByNameAsc(getOrganizationId(authentication)), CounterpartyDto.class);
     }
 
-    public CounterpartyDto saveCounterparty(Authentication authentication, Counterparty provider) {
-        providerRepository.findByNameOrderByIdAsc(provider.getName()).ifPresent(value -> {
-            if (value.getId() != provider.getId()) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
+    public CounterpartyDto saveCounterparty(Authentication authentication, Counterparty counterparty) {
+        providerRepository.findByNameAndOrganizationId(counterparty.getName(), getOrganizationId(authentication)).ifPresent(value -> {
+            if (!value.getId().equals(counterparty.getId())) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
         });
 
-        provider.setOrganization(getOrganization(authentication));
+        counterparty.setOrganization(getOrganization(authentication));
 
-        return mapperUtils.map(providerRepository.save(mapperUtils.map(provider, Counterparty.class)), CounterpartyDto.class);
+        return mapperUtils.map(providerRepository.save(counterparty), CounterpartyDto.class);
     }
 
 }

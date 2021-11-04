@@ -10,7 +10,7 @@ import ru.moore.AISUchetTehniki.services.SprService;
 
 import java.util.List;
 
-@CrossOrigin(origins = {"http://localhost:3000", "http://172.16.3.120:3000"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://172.16.3.120:3000", "http://192.168.5.227:3000"})
 @RestController
 @RequestMapping("/api/v1/app/spr")
 @RequiredArgsConstructor

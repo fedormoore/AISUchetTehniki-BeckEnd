@@ -11,6 +11,7 @@ public class DeviceTypeDto {
 
     private Long id;
     private String name;
+    private String level;
 
     private LocalDateTime createdAt;
 

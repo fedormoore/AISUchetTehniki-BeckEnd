@@ -15,8 +15,10 @@ public class LocationDto {
     private String type;
     private String name;
 
+    private LocationParentDto parent;
+
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<LocationDto> locations;
+    private List<LocationDto> child;
 
     private LocalDateTime createdAt;
 

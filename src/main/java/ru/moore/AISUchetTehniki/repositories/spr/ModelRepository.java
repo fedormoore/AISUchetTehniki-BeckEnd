@@ -10,7 +10,9 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
 
     List<Model> findAllByFirmId(Long id);
 
-    Optional<Model> findByNameOrderByIdAsc(String name);
+    Optional<Model> findByNameAndOrganizationIdAndFirmId(String name, Long organizationId, Long firmId);
 
     List<Model> findByOrderByIdDesc();
+
+    List<Model> findAllByFirmIdAndOrganizationIdOrderByNameDesc(Long id, Long organizationId);
 }
