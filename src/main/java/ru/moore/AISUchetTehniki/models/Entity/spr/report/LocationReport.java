@@ -1,24 +1,24 @@
-package ru.moore.AISUchetTehniki.models.Entity.spr;
+package ru.moore.AISUchetTehniki.models.Entity.spr.report;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import ru.moore.AISUchetTehniki.models.Entity.spr.LocationParent;
+import ru.moore.AISUchetTehniki.models.Entity.spr.Organization;
+import ru.moore.AISUchetTehniki.models.Entity.spr.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "spr_location")
-public class Location {
+public class LocationReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,26 +31,8 @@ public class Location {
     @Column(name = "name")
     private String name;
 
-    @ManyToOne()
-    @JoinColumn(name="parent")
-    private LocationParent parent;
-
-    @OneToMany(mappedBy = "parent")
-    private List<Location> child;
-
     @OneToMany(mappedBy = "location")
     private List<User> user;
-
-    @Column(name = "created_at")
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @Column(name = "update_at")
-    @UpdateTimestamp
-    private LocalDateTime updateAt;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
     @ManyToOne
     @JoinColumn(name="organization_id")
