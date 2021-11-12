@@ -14,16 +14,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportService {
 
-    private final MapperUtils mapperUtils;
-
-    private final LocationReportRepository locationReportRepository;
-
-    private Long getOrganizationId(Authentication authentication) {
-        return ((UserPrincipal) authentication.getPrincipal()).getOrganization_id();
-    }
-
-    public List<LocationUserReportDto> getAllLocationUser(Authentication authentication) {
-        return mapperUtils.mapAll(locationReportRepository.findAllByTypeAndOrganizationIdOrderByNameDesc("cabinet", getOrganizationId(authentication)), LocationUserReportDto.class);
-    }
+//    private final MapperUtils mapperUtils;
+//
+//    private final LocationReportRepository locationReportRepository;
+//
+//    private Long getOrganizationId(Authentication authentication) {
+//        return null;//((UserPrincipal) authentication.getPrincipal()).getOrganization_id();
+//    }
+//
+//    public List<LocationUserReportDto> getAllLocationUser(Authentication authentication) {
+//        return mapperUtils.mapAll(locationReportRepository.findAllByTypeAndOrganizationIdOrderByNameDesc("cabinet", getOrganizationId(authentication)), LocationUserReportDto.class);
+//    }
 
 }

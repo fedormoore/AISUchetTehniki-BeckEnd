@@ -12,5 +12,5 @@ public interface DeviceTypeRepository extends JpaRepository<DeviceType, Long> {
 
     Optional<DeviceType> findByName(String name);
 
-    List<DeviceType> findAllByLevelOrOrganizationIdOrderByNameAsc(String global, Long organizationId);
+    List<DeviceType> findAllByLevelOrGlobalIdOrderByNameAsc(String global, String globalId);
 }

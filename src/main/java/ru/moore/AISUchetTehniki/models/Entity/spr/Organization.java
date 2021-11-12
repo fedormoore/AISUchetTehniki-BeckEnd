@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,12 +26,14 @@ public class Organization {
     private Long id;
 
     @Column(name = "name")
+    @NotBlank(message = "Наименование не может быть пустым")
     private String name;
 
-    @OneToMany(mappedBy = "organization")
-    private List<User> users;
+    @Column(name = "global_id")
+    @NotBlank(message = "globalId не может быть пустым")
+    private String globalId;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable=false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -41,7 +44,7 @@ public class Organization {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @OneToMany(mappedBy = "organization")
-    private List<Location> locations;
+    @Column(name = "deleted")
+    private boolean deleted;
 
 }

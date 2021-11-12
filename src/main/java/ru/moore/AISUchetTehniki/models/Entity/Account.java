@@ -1,20 +1,24 @@
-package ru.moore.AISUchetTehniki.models.Entity.spr;
+package ru.moore.AISUchetTehniki.models.Entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "spr_users")
+@Table(name = "accounts")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+@Builder
+public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,32 +26,38 @@ public class User {
     private Long id;
 
     @Column(name = "email")
+    @Email(message = "Некорректный E-mail")
+    @NotBlank(message = "E-mail не может быть пустым")
     private String email;
 
     @Column(name = "telephone")
     private String telephone;
 
+    @Column(name="password")
+    @NotBlank(message = "Пароль не может быть пустым")
+    private String password;
+
     @Column(name = "last_name")
+    @NotBlank(message = "Фамилия не может быть пустым")
     private String lastName;
 
     @Column(name = "first_name")
+    @NotBlank(message = "Имя не может быть пустым")
     private String firstName;
 
     @Column(name = "middle_names")
     private String middleNames;
 
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private Location location;
+    @Column(name = "confirmation_code")
+    private String confirmationCode;
 
-    @ManyToOne
-    @JoinColumn(name="organization_id")
-    private Organization organization;
+    @Column(name = "confirmation")
+    private boolean confirmation;
 
     @Column(name = "global_id")
     private String globalId;
 
-    @Column(name = "created_at", updatable=false)
+    @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -57,7 +67,4 @@ public class User {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
-
-    @Column(name = "deleted")
-    private boolean deleted;
 }

@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
-import ru.moore.AISUchetTehniki.security.SignUpDto;
+import ru.moore.AISUchetTehniki.models.Entity.Account;
 import ru.moore.AISUchetTehniki.security.SignInDto;
 import ru.moore.AISUchetTehniki.services.AuthService;
+
+import javax.validation.Valid;
 
 @CrossOrigin(origins = {"*"})
 @RestController
@@ -17,7 +19,7 @@ public class AuthController {
     private final AuthService userService;
 
     @PostMapping("/signUp")
-    public ResponseEntity<?> registerUser(@RequestBody SignUpDto signUp) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody Account signUp) {
         return userService.registerUser(signUp);
     }
 

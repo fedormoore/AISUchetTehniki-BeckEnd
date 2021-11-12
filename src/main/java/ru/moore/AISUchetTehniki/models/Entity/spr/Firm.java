@@ -28,7 +28,13 @@ public class Firm {
     @Column(name = "level")
     private String level = "Local";
 
-    @Column(name = "created_at")
+    @OneToMany(mappedBy = "firm", fetch = FetchType.LAZY)
+    private List<Model> models;
+
+    @Column(name = "global_id")
+    private String globalId;
+
+    @Column(name = "created_at", updatable=false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -39,10 +45,6 @@ public class Firm {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @ManyToOne
-    @JoinColumn(name="organization_id")
-    private Organization organization;
-
-    @OneToMany(mappedBy = "firm")
-    private List<Model> models;
+    @Column(name = "deleted")
+    private boolean deleted;
 }

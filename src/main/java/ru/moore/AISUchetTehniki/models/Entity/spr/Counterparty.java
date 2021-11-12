@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Data
@@ -36,7 +37,10 @@ public class Counterparty {
     @Column(name = "contact")
     private String contact;
 
-    @Column(name = "created_at")
+    @Column(name = "global_id")
+    private String globalId;
+
+    @Column(name = "created_at", updatable=false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -47,8 +51,7 @@ public class Counterparty {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @ManyToOne
-    @JoinColumn(name="organization_id")
-    private Organization organization;
+    @Column(name = "deleted")
+    private boolean deleted;
 
 }

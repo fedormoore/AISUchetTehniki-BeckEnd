@@ -24,7 +24,18 @@ public class Model {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "created_at")
+    @ManyToOne
+    @JoinColumn(name = "firm_id")
+    private Firm firm;
+
+    @ManyToOne
+    @JoinColumn(name = "device_type_id")
+    private DeviceType deviceType;
+
+    @Column(name = "global_id")
+    private String globalId;
+
+    @Column(name = "created_at", updatable=false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -35,15 +46,6 @@ public class Model {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @ManyToOne
-    @JoinColumn(name="organization_id")
-    private Organization organization;
-
-    @ManyToOne
-    @JoinColumn(name = "firm_id")
-    private Firm firm;
-
-    @ManyToOne
-    @JoinColumn(name = "device_type_id")
-    private DeviceType deviceType;
+    @Column(name = "deleted")
+    private boolean deleted;
 }

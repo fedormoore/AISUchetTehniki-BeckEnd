@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface LocationReportRepository extends JpaRepository<LocationReport, Long> {
 
-    List<LocationReport> findAllByTypeAndOrganizationIdOrderByNameDesc(String type, Long organizationId);
+//    List<LocationReport> findAllByTypeAndOrganizationIdOrderByNameDesc(String type, Long organizationId);
 
 }

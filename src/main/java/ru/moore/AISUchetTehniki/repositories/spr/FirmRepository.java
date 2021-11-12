@@ -8,7 +8,5 @@ import java.util.Optional;
 
 public interface FirmRepository extends JpaRepository<Firm, Long> {
 
-    Optional<Firm> findByName(String name);
-
-    List<Firm> findAllByLevelOrOrganizationIdOrderByNameAsc(String global, Long organizationId);
+    List<Firm> findAllByLevelOrGlobalIdOrderByNameAsc(String global, String globalId);
 }

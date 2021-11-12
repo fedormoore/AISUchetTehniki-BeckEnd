@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class UserPrincipal {
 
     private Long id;
-
-    private Long organization_id;
+    private String globalId;
 
 }

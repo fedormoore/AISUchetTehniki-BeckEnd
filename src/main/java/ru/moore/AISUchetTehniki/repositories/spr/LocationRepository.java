@@ -9,8 +9,6 @@ import java.util.Optional;
 
 public interface LocationRepository extends JpaRepository<Location, Long> {
 
-    List<Location> findAllByTypeAndOrganizationIdOrderByNameDesc(String type, Long organizationId);
-
-    Optional<Location> findByTypeAndNameAndOrganizationId(String type, String name, Long organizationId);
+    List<Location> findAllByTypeAndGlobalIdOrderByNameDesc(String type, String globalId);
 
 }

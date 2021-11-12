@@ -8,11 +8,6 @@ import java.util.Optional;
 
 public interface ModelRepository extends JpaRepository<Model, Long> {
 
-    List<Model> findAllByFirmId(Long id);
+    List<Model> findAllByFirmIdAndGlobalIdOrderByNameDesc(Long firmId, String globalId);
 
-    Optional<Model> findByNameAndOrganizationIdAndFirmId(String name, Long organizationId, Long firmId);
-
-    List<Model> findByOrderByIdDesc();
-
-    List<Model> findAllByFirmIdAndOrganizationIdOrderByNameDesc(Long id, Long organizationId);
 }

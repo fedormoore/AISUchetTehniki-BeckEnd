@@ -1,21 +1,22 @@
-package ru.moore.AISUchetTehniki.models.Dto.spr;
+package ru.moore.AISUchetTehniki.models.Dto.spr.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor
-public class CounterpartyDto {
+public class CounterpartyRequestDto {
 
     private Long id;
+
+    @NotBlank(message = "Наименование не может быть пустым")
     private String name;
+
     private String inn;
     private String telephone;
     private String email;
     private String contact;
-
-    private LocalDateTime createdAt;
 
 }

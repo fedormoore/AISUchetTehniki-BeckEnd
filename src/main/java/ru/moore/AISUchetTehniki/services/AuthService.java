@@ -1,6 +1,7 @@
 package ru.moore.AISUchetTehniki.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,16 +15,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.moore.AISUchetTehniki.exeptions.ErrorTemplate;
-import ru.moore.AISUchetTehniki.exeptions.TemplateMessage;
-import ru.moore.AISUchetTehniki.security.SignUpDto;
-import ru.moore.AISUchetTehniki.models.Entity.spr.User;
-import ru.moore.AISUchetTehniki.repositories.spr.OrganizationRepository;
-import ru.moore.AISUchetTehniki.repositories.spr.UserRepository;
+import ru.moore.AISUchetTehniki.models.Entity.Account;
+import ru.moore.AISUchetTehniki.repositories.AccountRepository;
 import ru.moore.AISUchetTehniki.security.JwtResponse;
 import ru.moore.AISUchetTehniki.security.JwtTokenUtil;
 import ru.moore.AISUchetTehniki.services.mappers.MapperUtils;
 import ru.moore.AISUchetTehniki.utils.MailSender;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,30 +36,28 @@ public class AuthService implements UserDetailsService {
 
     private final JwtTokenUtil jwtTokenUtil;
 
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
 
     private final PasswordEncoder passwordEncoder;
-
-    private final OrganizationRepository organizationRepository;
 
     private final MapperUtils mapperUtils;
 
     private final MailSender mailSender;
 
-    public ResponseEntity<?> registerUser(SignUpDto signUp) {
-        if (organizationRepository.existsByName(signUp.getOrganization().getName())) {
-            return new ResponseEntity<>(new TemplateMessage(HttpStatus.UNAUTHORIZED.value(), "Ошбика","Организация уже используется!"), HttpStatus.UNAUTHORIZED);
-        }
-        if (userRepository.existsByEmail(signUp.getEmail())) {
-            return new ResponseEntity<>(new TemplateMessage(HttpStatus.UNAUTHORIZED.value(), "Ошбика","Почтовый ящик уже используется!"), HttpStatus.UNAUTHORIZED);
-        }
-
-        organizationRepository.save(signUp.getOrganization());
-
+    public ResponseEntity<?> registerUser(Account signUp) {
         signUp.setPassword(passwordEncoder.encode(signUp.getPassword()));
         signUp.setConfirmation(false);
         signUp.setConfirmationCode(UUID.randomUUID().toString());
-        userRepository.save(mapperUtils.map(signUp, User.class));
+        signUp.setGlobalId(UUID.randomUUID().toString());
+
+        try {
+            accountRepository.save(mapperUtils.map(signUp, Account.class));
+        }catch (DataIntegrityViolationException ex){
+            if (((SQLException) ex.getMostSpecificCause()).getSQLState().equals("23505")){
+                throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Почтовый ящик уже используется!");
+            }
+            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, ex.getRootCause().getMessage());
+        }
 
         String message = String.format(
                 "Здравствуйте, %s! \n" +
@@ -70,7 +67,7 @@ public class AuthService implements UserDetailsService {
         );
         mailSender.send(signUp.getEmail(), "Активация учетной записи", message);
 
-        return new ResponseEntity<>(new TemplateMessage(HttpStatus.OK.value(), "Информационное сообщение","Пользователь успешно зарегистрирован!\nПерейти по ссылке, высланной в письме для ативации учетной записи."), HttpStatus.OK);
+        return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 
     public ResponseEntity<?> loginUser(String login, String password) {
@@ -80,49 +77,41 @@ public class AuthService implements UserDetailsService {
             throw new ErrorTemplate(HttpStatus.NOT_FOUND, "Неверный логин или пароль!");
         }
 
-        User user = userRepository.findByEmail(login).get();
+        Account account = accountRepository.findByEmail(login).get();
 
-        if (!user.isConfirmation()) {
+        if (!account.isConfirmation()) {
             throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Учетная запись не активирована!");
         }
 
-        String token = jwtTokenUtil.generateToken(user);
+        String token = jwtTokenUtil.generateToken(account);
         return new ResponseEntity<>(new JwtResponse(token), HttpStatus.OK);
     }
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(String.format("User '%s' not found", username)));
+        Account account = findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(String.format("User '%s' not found", username)));
         List<GrantedAuthority> authorities = new ArrayList<>();
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(account.getEmail(), account.getPassword(), authorities);
     }
 
-    private Optional<User> findByUsername(String username) {
-        return userRepository.findByEmail(username);
+    private Optional<Account> findByUsername(String username) {
+        return accountRepository.findByEmail(username);
     }
 
     public boolean activateUser(String code) {
-        User user = userRepository.findByConfirmationCode(code);
+        Account account = accountRepository.findByConfirmationCode(code);
 
-        if (user == null) {
+        if (account == null) {
             return false;
         }
 
-        user.setConfirmationCode(null);
-        user.setConfirmation(true);
+        account.setConfirmationCode(null);
+        account.setConfirmation(true);
 
-        userRepository.save(user);
+        accountRepository.save(account);
 
         return true;
     }
 
-//    public UserDto getUser(Authentication authentication) {
-//        return mapperUtils.map(userRepository.findById(((UserPrincipal)authentication.getPrincipal()).getId()).get(), UserDto.class);
-//    }
-//
-//    public UserDto saveUser(Authentication authentication, User user) {
-//        User user1 = userRepository.findByEmail(((UserPrincipal)authentication.getPrincipal()).getEmail()).get();
-//        return mapperUtils.map(userRepository.save(user1), UserDto.class);
-//    }
 }

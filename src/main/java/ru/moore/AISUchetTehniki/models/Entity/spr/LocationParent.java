@@ -8,7 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,7 +28,13 @@ public class LocationParent {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "created_at")
+    @Column(name = "global_id")
+    private String globalId;
+
+    @OneToMany(mappedBy = "location")
+    private List<User> user;
+
+    @Column(name = "created_at", updatable=false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -39,8 +45,7 @@ public class LocationParent {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @ManyToOne
-    @JoinColumn(name="organization_id")
-    private Organization organization;
+    @Column(name = "deleted")
+    private boolean deleted;
 
 }

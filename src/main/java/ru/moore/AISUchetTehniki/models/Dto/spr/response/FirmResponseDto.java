@@ -1,4 +1,4 @@
-package ru.moore.AISUchetTehniki.models.Dto.spr;
+package ru.moore.AISUchetTehniki.models.Dto.spr.response;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,12 +7,12 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class FirmDto {
+public class FirmResponseDto {
 
     private Long id;
-    private String name;
-    private String level;
 
-    private LocalDateTime createdAt;
+    private String name;
+
+    private String level;
 
 }

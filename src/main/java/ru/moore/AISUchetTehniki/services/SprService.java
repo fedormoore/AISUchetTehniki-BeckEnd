@@ -5,14 +5,18 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.moore.AISUchetTehniki.exeptions.ErrorTemplate;
-import ru.moore.AISUchetTehniki.models.Dto.spr.*;
+import ru.moore.AISUchetTehniki.models.Dto.spr.request.*;
+import ru.moore.AISUchetTehniki.models.Dto.spr.response.*;
 import ru.moore.AISUchetTehniki.models.Entity.spr.*;
 import ru.moore.AISUchetTehniki.repositories.spr.*;
 import ru.moore.AISUchetTehniki.security.UserPrincipal;
 import ru.moore.AISUchetTehniki.services.mappers.MapperUtils;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -26,127 +30,122 @@ public class SprService {
     private final CounterpartyRepository providerRepository;
     private final MapperUtils mapperUtils;
 
-    private Long getOrganizationId(Authentication authentication) {
-        return ((UserPrincipal) authentication.getPrincipal()).getOrganization_id();
-    }
-
-    private Organization getOrganization(Authentication authentication) {
-        return Organization.builder()
-                .id(((UserPrincipal) authentication.getPrincipal()).getOrganization_id())
-                .build();
-    }
-
-    public List<LocationDto> getAllLocation(Authentication authentication) {
-        return mapperUtils.mapAll(locationRepository.findAllByTypeAndOrganizationIdOrderByNameDesc("country", getOrganizationId(authentication)), LocationDto.class);
-    }
-
-    public List<LocationDto> saveLocation(Authentication authentication, Location location) {
-        location.setOrganization(getOrganization(authentication));
-
-        locationRepository.findByTypeAndNameAndOrganizationId(location.getType(), location.getName(), getOrganizationId(authentication)).ifPresent(value -> {
-            if (!value.getId().equals(location.getId())) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
-        });
-
-        mapperUtils.map(locationRepository.save(location), LocationDto.class);
-        return mapperUtils.mapAll(locationRepository.findAllByTypeAndOrganizationIdOrderByNameDesc("country", getOrganizationId(authentication)), LocationDto.class);
-    }
-
-    public List<UserDto> getAllUser(Authentication authentication) {
-        return mapperUtils.mapAll(userRepository.findAllByOrganizationId(getOrganizationId(authentication)), UserDto.class);
-    }
-
-    public UserDto saveUser(Authentication authentication, User userIn) {
-        User user = new User();
-        if (userIn.getId() != null) {
-            user = userRepository.findById(userIn.getId()).get();
+    private String getGlobalId(Authentication authentication) {
+        if (authentication == null) {
+            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Нет секретного ключа");
         }
-
-        user.setEmail(userIn.getEmail());
-        user.setTelephone(userIn.getTelephone());
-        user.setLastName(userIn.getLastName());
-        user.setFirstName(userIn.getFirstName());
-        user.setMiddleNames(userIn.getMiddleNames());
-        user.setLocation(userIn.getLocation());
-        user.setOrganization(getOrganization(authentication));
-
-        return mapperUtils.map(userRepository.save(user), UserDto.class);
+        return ((UserPrincipal) authentication.getPrincipal()).getGlobalId();
     }
 
-    public List<DeviceTypeDto> getAllDeviceType(Authentication authentication) {
-        return mapperUtils.mapAll(deviceTypeRepository.findAllByLevelOrOrganizationIdOrderByNameAsc("Global", getOrganizationId(authentication)), DeviceTypeDto.class);
+    public List<LocationResponseDto> getAllLocation(Authentication authentication) {
+        return mapperUtils.mapAll(locationRepository.findAllByTypeAndGlobalIdOrderByNameDesc("country", getGlobalId(authentication)), LocationResponseDto.class);
     }
 
-    public DeviceTypeDto saveDeviceType(Authentication authentication, DeviceType deviceType) {
-        deviceTypeRepository.findByName(deviceType.getName()).ifPresent(value -> {
-            if (!value.getId().equals(deviceType.getId())) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
-        });
-
-        deviceType.setOrganization(getOrganization(authentication));
+    @Transactional
+    public List<LocationResponseDto> saveLocation(Authentication authentication, LocationRequestDto locationRequestDto) {
+        Location location = mapperUtils.map(locationRequestDto, Location.class);
+        location.setGlobalId(getGlobalId(authentication));
 
         try {
-            return mapperUtils.map(deviceTypeRepository.save(deviceType), DeviceTypeDto.class);
-        }catch (DataIntegrityViolationException ex){
+            locationRepository.save(location);
+        } catch (DataIntegrityViolationException ex) {
+            if (((SQLException) ex.getMostSpecificCause()).getSQLState().equals("23505")) {
+                throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
+            }
+            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, Objects.requireNonNull(ex.getRootCause()).getMessage());
+        }
+
+        return mapperUtils.mapAll(locationRepository.findAllByTypeAndGlobalIdOrderByNameDesc("country", getGlobalId(authentication)), LocationResponseDto.class);
+    }
+
+    public List<UserResponseDto> getAllUser(Authentication authentication) {
+        return mapperUtils.mapAll(userRepository.findAllByGlobalId(getGlobalId(authentication)), UserResponseDto.class);
+    }
+
+    public UserResponseDto saveUser(Authentication authentication, UserRequestDto userRequstDto) {
+        User user = mapperUtils.map(userRequstDto, User.class);
+        user.setGlobalId(getGlobalId(authentication));
+
+        try {
+            return mapperUtils.map(userRepository.save(user), UserResponseDto.class);
+        } catch (DataIntegrityViolationException ex) {
+            if (((SQLException) ex.getMostSpecificCause()).getSQLState().equals("23505")) {
+                throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
+            }
+            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, Objects.requireNonNull(ex.getRootCause()).getMessage());
+        }
+    }
+
+    public List<DeviceTypeResponseDto> getAllDeviceType(Authentication authentication) {
+        return mapperUtils.mapAll(deviceTypeRepository.findAllByLevelOrGlobalIdOrderByNameAsc("Global", getGlobalId(authentication)), DeviceTypeResponseDto.class);
+    }
+
+    public DeviceTypeResponseDto saveDeviceType(Authentication authentication, DeviceTypeRequestDto deviceTypeRequestDto) {
+        DeviceType deviceType = mapperUtils.map(deviceTypeRequestDto, DeviceType.class);
+        deviceType.setGlobalId(getGlobalId(authentication));
+
+        try {
+            return mapperUtils.map(deviceTypeRepository.save(deviceType), DeviceTypeResponseDto.class);
+        } catch (DataIntegrityViolationException ex) {
+            if (((SQLException) ex.getMostSpecificCause()).getSQLState().equals("23505")) {
+                throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
+            }
+            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, Objects.requireNonNull(ex.getRootCause()).getMessage());
+        }
+    }
+
+    public List<FirmResponseDto> getAllFirm(Authentication authentication) {
+        return mapperUtils.mapAll(firmRepository.findAllByLevelOrGlobalIdOrderByNameAsc("Global", getGlobalId(authentication)), FirmResponseDto.class);
+    }
+
+    public FirmResponseDto saveFirm(Authentication authentication, FirmRequestDto firmRequestDto) {
+        Firm firm = mapperUtils.map(firmRequestDto, Firm.class);
+        firm.setGlobalId(getGlobalId(authentication));
+
+        try {
+            return mapperUtils.map(firmRepository.save(mapperUtils.map(firm, Firm.class)), FirmResponseDto.class);
+        } catch (DataIntegrityViolationException ex) {
+            if (((SQLException) ex.getMostSpecificCause()).getSQLState().equals("23505")) {
+                throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
+            }
+            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, Objects.requireNonNull(ex.getRootCause()).getMessage());
+        }
+    }
+
+    public List<ModelResponseDto> getModelByFirmId(Authentication authentication, Long id) {
+        return mapperUtils.mapAll(modelRepository.findAllByFirmIdAndGlobalIdOrderByNameDesc(id, getGlobalId(authentication)), ModelResponseDto.class);
+    }
+
+    public ModelResponseDto saveModel(Authentication authentication, ModelRequestDto modelRequestDto) {
+        Model model = mapperUtils.map(modelRequestDto, Model.class);
+        model.setGlobalId(getGlobalId(authentication));
+
+        try {
+            return mapperUtils.map(modelRepository.save(model), ModelResponseDto.class);
+        } catch (DataIntegrityViolationException ex) {
+            if (((SQLException) ex.getMostSpecificCause()).getSQLState().equals("23505")) {
+                throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
+            }
             throw new ErrorTemplate(HttpStatus.BAD_REQUEST, ex.getRootCause().getMessage());
         }
     }
 
-    public List<FirmDto> getAllFirm(Authentication authentication) {
-        return mapperUtils.mapAll(firmRepository.findAllByLevelOrOrganizationIdOrderByNameAsc("Global", getOrganizationId(authentication)), FirmDto.class);
+    public List<CounterpartyResponseDto> getAllCounterparty(Authentication authentication) {
+        return mapperUtils.mapAll(providerRepository.findAllByGlobalIdOrderByNameAsc(getGlobalId(authentication)), CounterpartyResponseDto.class);
     }
 
-    public FirmDto saveFirm(Authentication authentication, Firm firm) {
-        firmRepository.findByName(firm.getName()).ifPresent(value -> {
-            if (!value.getId().equals(firm.getId())) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
-        });
-
-        firm.setOrganization(getOrganization(authentication));
-
-        return mapperUtils.map(firmRepository.save(mapperUtils.map(firm, Firm.class)), FirmDto.class);
-    }
-
-//    public List<ModelDto> getAllModel(Authentication authentication) {
-//        return mapperUtils.mapAll(modelRepository.findByOrderByIdDesc(), ModelDto.class);
-//    }
-
-    public List<ModelDto> getModelByFirmId(Authentication authentication, Long id) {
-        return mapperUtils.mapAll(modelRepository.findAllByFirmIdAndOrganizationIdOrderByNameDesc(id, getOrganizationId(authentication)), ModelDto.class);
-    }
-
-//    public ModelDto getModelById(Long id) {
-//        return mapperUtils.map(modelRepository.findById(id).get(), ModelDto.class);
-//    }
-
-    public ModelDto saveModel(Authentication authentication, Model model) {
-        modelRepository.findByNameAndOrganizationIdAndFirmId(model.getName(), getOrganizationId(authentication), model.getFirm().getId()).ifPresent(value -> {
-            if (!value.getId().equals(model.getId())) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
-        });
-
-        if (deviceTypeRepository.findByName(model.getDeviceType().getName()).isEmpty()) {
-            DeviceType deviceType = mapperUtils.map(saveDeviceType(authentication, model.getDeviceType()), DeviceType.class);
-            model.setDeviceType(deviceType);
-        }
-
-        model.setOrganization(getOrganization(authentication));
+    public CounterpartyResponseDto saveCounterparty(Authentication authentication, CounterpartyRequestDto counterpartyRequestDto) {
+        Counterparty counterparty = mapperUtils.map(counterpartyRequestDto, Counterparty.class);
+        counterparty.setGlobalId(getGlobalId(authentication));
 
         try {
-            return mapperUtils.map(modelRepository.save(mapperUtils.map(model, Model.class)), ModelDto.class);
-        }catch (DataIntegrityViolationException ex){
-            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, ex.getRootCause().getMessage());
+            return mapperUtils.map(providerRepository.save(counterparty), CounterpartyResponseDto.class);
+        } catch (DataIntegrityViolationException ex) {
+            if (((SQLException) ex.getMostSpecificCause()).getSQLState().equals("23505")) {
+                throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
+            }
+            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, Objects.requireNonNull(ex.getRootCause()).getMessage());
         }
-    }
-
-    public List<CounterpartyDto> getAllCounterparty(Authentication authentication) {
-        return mapperUtils.mapAll(providerRepository.findAllByOrganizationIdOrderByNameAsc(getOrganizationId(authentication)), CounterpartyDto.class);
-    }
-
-    public CounterpartyDto saveCounterparty(Authentication authentication, Counterparty counterparty) {
-        providerRepository.findByNameAndOrganizationId(counterparty.getName(), getOrganizationId(authentication)).ifPresent(value -> {
-            if (!value.getId().equals(counterparty.getId())) throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
-        });
-
-        counterparty.setOrganization(getOrganization(authentication));
-
-        return mapperUtils.map(providerRepository.save(counterparty), CounterpartyDto.class);
     }
 
 }

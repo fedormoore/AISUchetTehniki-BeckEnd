@@ -34,7 +34,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             UserPrincipal user = null;
 
             if (StringUtils.hasText(jwt)) {
-//                jwtTokenUtil.validateToken(jwt);
+                jwtTokenUtil.validateToken(jwt);
                 user = jwtTokenUtil.getUserFromToken(jwt);
 
                 List<GrantedAuthority> authorities = new ArrayList<>();

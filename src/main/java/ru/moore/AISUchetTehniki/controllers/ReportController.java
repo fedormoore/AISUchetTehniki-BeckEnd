@@ -17,11 +17,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportController {
 
-    private final ReportService reportService;
-
-    @GetMapping("/location_user")
-    public List<LocationUserReportDto> allAddress(Authentication authentication) {
-        return reportService.getAllLocationUser(authentication);
-    }
+//    private final ReportService reportService;
+//
+//    @GetMapping("/location_user")
+//    public List<LocationUserReportDto> allAddress(Authentication authentication) {
+//        return reportService.getAllLocationUser(authentication);
+//    }
 
 }
