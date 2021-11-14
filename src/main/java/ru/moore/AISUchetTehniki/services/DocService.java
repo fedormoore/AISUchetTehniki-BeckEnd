@@ -1,28 +1,29 @@
 package ru.moore.AISUchetTehniki.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.moore.AISUchetTehniki.exeptions.ErrorTemplate;
+import ru.moore.AISUchetTehniki.models.Dto.doc.request.IncomeMainRequestDto;
 import ru.moore.AISUchetTehniki.models.Dto.doc.response.IncomeMainResponseDto;
-import ru.moore.AISUchetTehniki.models.Entity.spr.User;
 import ru.moore.AISUchetTehniki.models.Entity.doc.*;
-import ru.moore.AISUchetTehniki.models.Entity.spr.Model;
 import ru.moore.AISUchetTehniki.repositories.doc.*;
 import ru.moore.AISUchetTehniki.security.UserPrincipal;
 import ru.moore.AISUchetTehniki.services.mappers.MapperUtils;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class DocService {
 
     private final IncomeMainRepository incomeMainRepository;
-//    private final IncomeSubRepository incomeSubRepository;
+    private final IncomeSubRepository incomeSubRepository;
+    //    private final IncomeSubRepository incomeSubRepository;
 //
 //    private final WriteOffMainRepository writeOffMainRepository;
 //    private final WriteOffSubRepository writeOffSubRepository;
@@ -45,13 +46,21 @@ public class DocService {
         return mapperUtils.mapAll(incomeMainRepository.findAllByGlobalIdOrderByIdAsc(getGlobalId(authentication)), IncomeMainResponseDto.class);
     }
 
-//    @Transactional
-//    public IncomeMainDto saveIncomeMain(Authentication authentication, IncomeMain docMain) {
-//        User user = User.builder()
-//                .id(((UserPrincipal) authentication.getPrincipal()).getId())
-//                .build();
-//        docMain.setUser(user);
-//
+    @Transactional
+    public IncomeMainResponseDto saveIncomeMain(Authentication authentication, IncomeMainRequestDto incomeMainRequestDto) {
+        IncomeMain incomeMain = mapperUtils.map(incomeMainRequestDto, IncomeMain.class);
+        incomeMain.setGlobalId(getGlobalId(authentication));
+
+//        for (IncomeSub in: incomeMain.getDocSubs()) {
+//            in.setDocMain(incomeMain);
+//        }
+
+        try {
+            return mapperUtils.map(incomeMainRepository.save(incomeMain), IncomeMainResponseDto.class);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, Objects.requireNonNull(ex.getRootCause()).getMessage());
+        }
+
 //        if (docMain.getExecuted()) {
 //            List<IncomeSubDto> docSubDtoList = mapperUtils.mapAll(incomeSubRepository.findAllByDocMainIdAndDocSub(docMain.getId(), null), IncomeSubDto.class);
 //            for (IncomeSubDto docSub : docSubDtoList) {
@@ -61,9 +70,7 @@ public class DocService {
 //                }
 //            }
 //        }
-//
-//        return mapperUtils.map(incomeMainRepository.save(docMain), IncomeMainDto.class);
-//    }
+    }
 //
 //    public List<IncomeSubDto> getIncomeSubById(Authentication authentication, Long id) {
 //        return mapperUtils.mapAll(incomeSubRepository.findAllByDocMainIdAndDocSub(id, null), IncomeSubDto.class);

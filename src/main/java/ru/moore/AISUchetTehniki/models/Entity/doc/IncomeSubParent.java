@@ -1,41 +1,49 @@
-package ru.moore.AISUchetTehniki.models.Entity.spr;
+package ru.moore.AISUchetTehniki.models.Entity.doc;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import ru.moore.AISUchetTehniki.models.Entity.doc.IncomeSub;
+import ru.moore.AISUchetTehniki.models.Entity.spr.Model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "spr_model")
-public class Model {
+@Table(name = "DOC_INCOME_SUB")
+public class IncomeSubParent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Basic(optional = false)
+    @Column(name="id")
     private Long id;
 
-    @Column(name = "name")
-    private String name;
-
     @ManyToOne
-    @JoinColumn(name = "firm_id")
-    private Firm firm;
+    @JoinColumn(name = "model_id")
+    private Model model;
 
-    @ManyToOne
-    @JoinColumn(name = "device_type_id")
-    private DeviceType deviceType;
+    @Column(name = "count")
+    private int count;
 
-    @Column(name = "global_id")
-    private String globalId;
+    @Column(name = "sum")
+    private double sum;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private Set<IncomeSub> children = new HashSet<>();
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "doc_main_id", nullable = false)
+    private IncomeMain docMain;
 
     @Column(name = "created_at", updatable=false)
     @CreationTimestamp
@@ -50,10 +58,4 @@ public class Model {
 
     @Column(name = "deleted")
     private boolean deleted;
-
-//    @OneToMany(mappedBy = "model", fetch = FetchType.LAZY)
-//    private List<IncomeSub> incomeSubs;
-//
-//    @OneToMany(mappedBy = "model", fetch = FetchType.LAZY)
-//    private List<IncomeSubParent> incomeSubParents;
 }

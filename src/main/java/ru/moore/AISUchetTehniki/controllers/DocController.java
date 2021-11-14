@@ -1,12 +1,21 @@
 package ru.moore.AISUchetTehniki.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import ru.moore.AISUchetTehniki.models.Dto.doc.request.IncomeMainRequestDto;
+import ru.moore.AISUchetTehniki.models.Dto.doc.request.IncomeSubRequestDto;
 import ru.moore.AISUchetTehniki.models.Dto.doc.response.IncomeMainResponseDto;
+import ru.moore.AISUchetTehniki.models.Entity.doc.IncomeMain;
+import ru.moore.AISUchetTehniki.models.Entity.doc.IncomeSub;
 import ru.moore.AISUchetTehniki.services.DocService;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = {"*"})
 @RestController
@@ -21,11 +30,12 @@ public class DocController {
         return docService.getAllIncomeMain(authentication);
     }
 
-//    @PostMapping("/save_income_main")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public IncomeMainDto saveIncomeMain(Authentication authentication, @RequestBody IncomeMain docMain) {
-//        return docService.saveIncomeMain(authentication, docMain);
-//    }
+    @PostMapping("/income_main")
+    @ResponseStatus(HttpStatus.CREATED)
+    public IncomeMainResponseDto saveIncomeMain(Authentication authentication, @Valid  @RequestBody IncomeMainRequestDto docMain) {
+        return docService.saveIncomeMain(authentication, docMain);
+    }
+
 //
 //    @GetMapping("/income_sub/{id}")
 //    public List<IncomeSubDto> getIncomeSubById(Authentication authentication, @PathVariable Long id) {

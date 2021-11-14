@@ -281,6 +281,31 @@ CREATE TABLE IF NOT EXISTS SPR_MODEL
     deleted        BOOLEAN   DEFAULT false
 );
 
+INSERT INTO spr_model (id, name, firm_id, device_type_id, global_id, created_at, update_at, deleted_at, deleted)
+VALUES (1, 'ASUS', 5, 2, '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-13 10:14:51.572643',
+        '2021-11-13 10:14:51.572643', null, false);
+INSERT INTO spr_model (id, name, firm_id, device_type_id, global_id, created_at, update_at, deleted_at, deleted)
+VALUES (2, 'HP ИБП', 1, 19, '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-13 10:15:09.504307',
+        '2021-11-13 10:15:09.504307', null, false);
+INSERT INTO spr_model (id, name, firm_id, device_type_id, global_id, created_at, update_at, deleted_at, deleted)
+VALUES (3, 'HP Компьютер', 1, 1, '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-13 10:15:36.495860',
+        '2021-11-13 10:15:36.495860', null, false);
+INSERT INTO spr_model (id, name, firm_id, device_type_id, global_id, created_at, update_at, deleted_at, deleted)
+VALUES (4, 'HP Видеокарта', 1, 6, '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-13 10:15:52.921275',
+        '2021-11-13 10:15:52.921275', null, false);
+INSERT INTO spr_model (id, name, firm_id, device_type_id, global_id, created_at, update_at, deleted_at, deleted)
+VALUES (5, 'Клавиатура', 2, 17, '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-13 10:16:11.731455',
+        '2021-11-13 10:16:11.731455', null, false);
+INSERT INTO spr_model (id, name, firm_id, device_type_id, global_id, created_at, update_at, deleted_at, deleted)
+VALUES (6, 'Мышь', 2, 22, '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-13 10:16:18.527174',
+        '2021-11-13 10:16:18.527174', null, false);
+INSERT INTO spr_model (id, name, firm_id, device_type_id, global_id, created_at, update_at, deleted_at, deleted)
+VALUES (7, 'SSD', 3, 9, '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-13 10:16:28.205818',
+        '2021-11-13 10:16:28.205818', null, false);
+INSERT INTO spr_model (id, name, firm_id, device_type_id, global_id, created_at, update_at, deleted_at, deleted)
+VALUES (8, 'Sam материнская плата', 4, 4, '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-13 10:16:52.441574',
+        '2021-11-13 10:16:52.441574', null, false);
+
 CREATE TABLE IF NOT EXISTS SPR_COUNTERPARTY
 (
     id         bigserial    not null
@@ -328,23 +353,23 @@ VALUES (6, 'ИП Слинкин', null, null, null, null, '08e85e94-a327-4b53-84
 
 CREATE TABLE IF NOT EXISTS DOC_INCOME_MAIN
 (
-    id              bigserial    not null
+    id              bigserial      not null
         constraint doc_income_main_table_pk primary key,
 
     executed        boolean,
     data_executed   date,
 
-    number_doc      VARCHAR(50)  not null,
-    data_doc        date         not null,
+    number_doc      VARCHAR(50)    not null,
+    data_doc        date           not null,
 
-    sum_con         money,
-    number_con      VARCHAR(50),
-    data_con        date,
+    sum_con         numeric(10, 2) not null,
+    number_con      VARCHAR(50)    not null,
+    data_con        date           not null,
 
-    counterparty_id bigint       not null REFERENCES SPR_COUNTERPARTY (id),
+    counterparty_id bigint         not null REFERENCES SPR_COUNTERPARTY (id),
     organization_id bigint REFERENCES SPR_ORGANIZATION (id),
 
-    global_id       VARCHAR(500) NOT NULL,
+    global_id       VARCHAR(500)   NOT NULL,
     created_at      timestamp default current_timestamp,
     update_at       timestamp default current_timestamp,
     deleted_at      timestamp,
@@ -354,56 +379,90 @@ CREATE TABLE IF NOT EXISTS DOC_INCOME_MAIN
 INSERT INTO public.doc_income_main (id, executed, data_executed, number_doc, data_doc, sum_con, number_con, data_con,
                                     counterparty_id, organization_id, global_id, created_at, update_at, deleted_at,
                                     deleted)
-VALUES (1, true, '2021-11-08', '1', '2021-11-08', '1 000,00 ?', '01', '2021-11-01', 1, null,
+VALUES (1, true, '2021-11-08', '1', '2021-11-08', '1000.01', '01', '2021-11-01', 1, null,
         '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-12 03:38:49.638153', '2021-11-12 03:38:49.638153', null,
         false);
 INSERT INTO public.doc_income_main (id, executed, data_executed, number_doc, data_doc, sum_con, number_con, data_con,
                                     counterparty_id, organization_id, global_id, created_at, update_at, deleted_at,
                                     deleted)
-VALUES (2, false, null, '2', '2021-11-08', '1 100,00 ?', '02', '2021-11-02', 2, null,
+VALUES (2, false, null, '2', '2021-11-08', '1100.10', '02', '2021-11-02', 2, null,
         '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-12 03:38:49.638153', '2021-11-12 03:38:49.638153', null,
         false);
 INSERT INTO public.doc_income_main (id, executed, data_executed, number_doc, data_doc, sum_con, number_con, data_con,
                                     counterparty_id, organization_id, global_id, created_at, update_at, deleted_at,
                                     deleted)
-VALUES (3, false, null, '3', '2021-11-09', '1 200,00 ?', '03', '2021-11-03', 3, null,
+VALUES (3, false, null, '3', '2021-11-09', '1200.55', '03', '2021-11-03', 3, null,
         '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-12 03:38:49.638153', '2021-11-12 03:38:49.638153', null,
         false);
 INSERT INTO public.doc_income_main (id, executed, data_executed, number_doc, data_doc, sum_con, number_con, data_con,
                                     counterparty_id, organization_id, global_id, created_at, update_at, deleted_at,
                                     deleted)
-VALUES (4, false, null, '4', '2021-11-09', '1 300,00 ?', '04', '2021-11-04', 4, null,
+VALUES (4, false, null, '4', '2021-11-09', '1300.00', '04', '2021-11-04', 4, null,
         '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-12 03:38:49.638153', '2021-11-12 03:38:49.638153', null,
         false);
 INSERT INTO public.doc_income_main (id, executed, data_executed, number_doc, data_doc, sum_con, number_con, data_con,
                                     counterparty_id, organization_id, global_id, created_at, update_at, deleted_at,
                                     deleted)
-VALUES (5, false, null, '5', '2021-11-10', '1 400,00 ?', '05', '2021-11-05', 5, null,
+VALUES (5, false, null, '5', '2021-11-10', '1400.00', '05', '2021-11-05', 5, null,
         '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-12 03:38:49.638153', '2021-11-12 03:38:49.638153', null,
         false);
 INSERT INTO public.doc_income_main (id, executed, data_executed, number_doc, data_doc, sum_con, number_con, data_con,
                                     counterparty_id, organization_id, global_id, created_at, update_at, deleted_at,
                                     deleted)
-VALUES (6, true, '2021-11-10', '6', '2021-11-10', '1 500,00 ?', '06', '2021-11-08', 1, null,
+VALUES (6, true, '2021-11-10', '6', '2021-11-10', '1500.00', '06', '2021-11-08', 1, null,
         '08e85e94-a327-4b53-846c-ee936d9f20b5', '2021-11-12 03:38:49.638153', '2021-11-12 03:38:49.638153', null,
         false);
 
--- CREATE TABLE IF NOT EXISTS DOC_INCOME_SUB
--- (
---     id              bigserial not null
---         constraint doc_income_sub_table_pk primary key,
---
---     model_id        bigint REFERENCES SPR_MODEL (id),
---     count           integer,
---     parent          integer,
--- sum         money,
---     doc_main_id     bigint REFERENCES DOC_INCOME_MAIN (id),
---
---     created_at      timestamp default current_timestamp,
---     update_at       timestamp default current_timestamp,
---     deleted_at      timestamp,
---     deleted         BOOLEAN   DEFAULT false
--- );
+CREATE TABLE IF NOT EXISTS DOC_INCOME_SUB
+(
+    id          bigserial      not null
+        constraint doc_income_sub_table_pk primary key,
+
+    model_id    bigint         not null REFERENCES SPR_MODEL (id),
+    count       integer        not null,
+    parent_id      bigint REFERENCES DOC_INCOME_SUB (id),
+    sum         numeric(10, 2) not null,
+    doc_main_id bigint         REFERENCES DOC_INCOME_MAIN (id),
+
+    created_at  timestamp default current_timestamp,
+    update_at   timestamp default current_timestamp,
+    deleted_at  timestamp,
+    deleted     BOOLEAN   DEFAULT false
+);
+
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (1, 1, 1, null, '100.00', 1, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (2, 2, 1, null, '200.00', 1, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (3, 3, 1, null, '300.00', 1, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (4, 3, 1, null, '400.00', 2, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (5, 4, 1, 4, '500.00', 2, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (6, 5, 1, 4, '600.00', 2, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (7, 6, 1, 4, '700.00', 2, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (8, 8, 1, null, '800.00', 3, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (9, 7, 1, null, '900.00', 3, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (10, 6, 1, null, '1000.00', 3, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (11, 2, 1, null, '1100.00', 3, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (12, 1, 1, null, '1200.00', 4, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (13, 3, 1, null, '400.00', 2, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (14, 4, 1, 13, '500.00', 2, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (15, 5, 1, 14, '600.00', 2, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+INSERT INTO doc_income_sub (id, model_id, count, parent_id, sum, doc_main_id, created_at, update_at, deleted_at, deleted)
+VALUES (16, 6, 1, 15, '700.00', 2, '2021-11-13 05:25:11.782845', '2021-11-13 05:25:11.782845', null, false);
+
 --
 -- insert into DOC_INCOME_SUB(model_id, count, parent, doc_main_id)
 -- values (3, 2, null, 1);

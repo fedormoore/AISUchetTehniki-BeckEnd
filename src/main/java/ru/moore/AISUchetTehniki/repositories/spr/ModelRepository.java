@@ -10,4 +10,5 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
 
     List<Model> findAllByFirmIdAndGlobalIdOrderByNameDesc(Long firmId, String globalId);
 
+    List<Model> findAllByGlobalIdOrderByNameDesc(String globalId);
 }

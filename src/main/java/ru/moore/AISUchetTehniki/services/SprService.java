@@ -112,6 +112,10 @@ public class SprService {
         }
     }
 
+    public List<ModelResponseDto> getAllModel(Authentication authentication) {
+        return mapperUtils.mapAll(modelRepository.findAllByGlobalIdOrderByNameDesc(getGlobalId(authentication)), ModelResponseDto.class);
+    }
+
     public List<ModelResponseDto> getModelByFirmId(Authentication authentication, Long id) {
         return mapperUtils.mapAll(modelRepository.findAllByFirmIdAndGlobalIdOrderByNameDesc(id, getGlobalId(authentication)), ModelResponseDto.class);
     }

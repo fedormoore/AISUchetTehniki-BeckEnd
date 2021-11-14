@@ -63,6 +63,11 @@ public class SprController {
         return sprService.saveFirm(authentication, firm);
     }
 
+    @GetMapping("/model")
+    public List<ModelResponseDto> allModel(Authentication authentication) {
+        return sprService.getAllModel(authentication);
+    }
+
     @GetMapping("/model/{id}")
     public List<ModelResponseDto> getModelByFirmId(Authentication authentication, @PathVariable Long id) {
         return sprService.getModelByFirmId(authentication, id);
