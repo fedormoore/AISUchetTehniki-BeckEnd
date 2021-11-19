@@ -27,11 +27,11 @@ public class Model {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "firm_id")
+//    @JoinColumn(name = "firm_id")
     private Firm firm;
 
     @ManyToOne
-    @JoinColumn(name = "device_type_id")
+//    @JoinColumn(name = "device_type_id")
     private DeviceType deviceType;
 
     @Column(name = "global_id")

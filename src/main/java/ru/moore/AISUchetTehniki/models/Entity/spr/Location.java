@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -33,6 +34,8 @@ public class Location {
     private LocationParent parent;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+//    @Where(clause = "parent is null")
+    @OrderBy(value = "name asc")
     private List<Location> children;
 
     @Column(name = "global_id")

@@ -28,8 +28,8 @@ public class Firm {
     @Column(name = "level")
     private String level = "Local";
 
-    @OneToMany(mappedBy = "firm", fetch = FetchType.LAZY)
-    private List<Model> models;
+//    @OneToMany(mappedBy = "firm", fetch = FetchType.LAZY)
+//    private List<Model> models;
 
     @Column(name = "global_id")
     private String globalId;

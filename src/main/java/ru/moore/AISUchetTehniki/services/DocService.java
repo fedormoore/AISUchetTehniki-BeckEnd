@@ -9,11 +9,18 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.moore.AISUchetTehniki.exeptions.ErrorTemplate;
 import ru.moore.AISUchetTehniki.models.Dto.doc.request.IncomeMainRequestDto;
 import ru.moore.AISUchetTehniki.models.Dto.doc.response.IncomeMainResponseDto;
-import ru.moore.AISUchetTehniki.models.Entity.doc.*;
-import ru.moore.AISUchetTehniki.repositories.doc.*;
+import ru.moore.AISUchetTehniki.models.Entity.History;
+import ru.moore.AISUchetTehniki.models.Entity.Registry;
+import ru.moore.AISUchetTehniki.models.Entity.doc.IncomeMain;
+import ru.moore.AISUchetTehniki.models.Entity.doc.IncomeSub;
+import ru.moore.AISUchetTehniki.repositories.RegistryRepository;
+import ru.moore.AISUchetTehniki.repositories.doc.IncomeMainRepository;
+import ru.moore.AISUchetTehniki.repositories.doc.IncomeSubRepository;
 import ru.moore.AISUchetTehniki.security.UserPrincipal;
 import ru.moore.AISUchetTehniki.services.mappers.MapperUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,8 +38,8 @@ public class DocService {
 //    private final RecycleMainRepository recycleMainRepository;
 //    private final RecycleSubRepository recycleSubRepository;
 //
-//    private final RegistryRepository registryRepository;
-//    private final HistoryRepository historyRepository;
+    private final RegistryRepository registryRepository;
+    //    private final HistoryRepository historyRepository;
     private final MapperUtils mapperUtils;
 
     private String getGlobalId(Authentication authentication) {
@@ -51,26 +58,56 @@ public class DocService {
         IncomeMain incomeMain = mapperUtils.map(incomeMainRequestDto, IncomeMain.class);
         incomeMain.setGlobalId(getGlobalId(authentication));
 
-//        for (IncomeSub in: incomeMain.getDocSubs()) {
-//            in.setDocMain(incomeMain);
-//        }
+        if (incomeMain.getExecuted()) {
+            for (IncomeSub docSub : incomeMain.getDocSubs()) {
+
+                Registry registry = mapperUtils.map(docSub, Registry.class);
+                registry.setGlobalId(getGlobalId(authentication));
+
+                if (docSub.getChildren() != null) {
+                    registry.setChildren(insertRegistry(getGlobalId(authentication), docSub.getChildren()));
+                }
+
+                List<History> historyList = new ArrayList<>();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+                History history = History.builder()
+                        .text("Поступление. Основание № " + incomeMain.getNumberDoc() + " дата " + dateFormat.format(incomeMain.getDataDoc()))
+                        .build();
+                historyList.add(history);
+
+                registry.setHistories(historyList);
+
+                for (int i = 0; i < docSub.getCount(); i++) {
+                    registryRepository.save(registry);
+                }
+            }
+        }
 
         try {
             return mapperUtils.map(incomeMainRepository.save(incomeMain), IncomeMainResponseDto.class);
         } catch (DataIntegrityViolationException ex) {
             throw new ErrorTemplate(HttpStatus.BAD_REQUEST, Objects.requireNonNull(ex.getRootCause()).getMessage());
         }
-
-//        if (docMain.getExecuted()) {
-//            List<IncomeSubDto> docSubDtoList = mapperUtils.mapAll(incomeSubRepository.findAllByDocMainIdAndDocSub(docMain.getId(), null), IncomeSubDto.class);
-//            for (IncomeSubDto docSub : docSubDtoList) {
-//                for (int i = 0; i < docSub.getCount(); i++) {
-//                    Registry registry = insertRegistry(null, docSub, user);
-//                    registryRepository.save(registry);
-//                }
-//            }
-//        }
     }
+
+    private List<Registry> insertRegistry(String globalId, List<IncomeSub> docSubIn) {
+        List<Registry> registryChildrenList = new ArrayList<>();
+
+        for (IncomeSub docSub : docSubIn) {
+            for (int i = 0; i < docSub.getCount(); i++) {
+                Registry registryTemp = mapperUtils.map(docSub, Registry.class);
+                registryTemp.setGlobalId(globalId);
+                if (docSub.getChildren() != null) {
+                    registryTemp.setChildren(insertRegistry(globalId, docSub.getChildren()));
+                }
+                registryChildrenList.add(registryTemp);
+            }
+
+        }
+
+        return registryChildrenList;
+    }
+
 //
 //    public List<IncomeSubDto> getIncomeSubById(Authentication authentication, Long id) {
 //        return mapperUtils.mapAll(incomeSubRepository.findAllByDocMainIdAndDocSub(id, null), IncomeSubDto.class);
@@ -160,32 +197,6 @@ public class DocService {
 //        return mapperUtils.mapAll(recycleSubRepository.findAllByDocMainId(id), RecycleMainDto.class);
 //    }
 //
-//    private Registry insertRegistry(Registry registryIn, IncomeSubDto docSub, User user) {
-//        List<Registry> registryList = new ArrayList<>();
-//
-//        Registry registry = Registry.builder()
-//                .model(mapperUtils.map(docSub.getModel(), Model.class))
-//                .user(user)
-//                .registry(registryIn)
-//                .build();
-//
-//        History history = History.builder()
-//                .user(user)
-//                .text("Поступление. Основание № "+docSub.getDocMain().getNumberDoc()+" дата "+docSub.getDocMain().getDataDoc())
-//                .registry(registry)
-//                .build();
-//        historyRepository.save(history);
-//
-//        if (docSub.getDocSubs().size() > 0) {
-//            for (IncomeSubDto docSubL : docSub.getDocSubs()) {
-//                for (int i = 0; i < docSubL.getCount(); i++) {
-//                    registryList.add(insertRegistry(registry, docSubL, user));
-//                }
-//            }
-//            registry.setRegisters(registryList);
-//        }
-//
-//        return registry;
-//    }
+
 
 }

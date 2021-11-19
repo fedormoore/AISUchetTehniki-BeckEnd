@@ -1,11 +1,14 @@
-package ru.moore.AISUchetTehniki.models.Entity.doc;
+package ru.moore.AISUchetTehniki.models.Entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import ru.moore.AISUchetTehniki.models.Entity.spr.Location;
 import ru.moore.AISUchetTehniki.models.Entity.spr.Model;
+import ru.moore.AISUchetTehniki.models.Entity.spr.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,26 +18,37 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "DOC_INCOME_SUB")
-public class IncomeSub {
+@Table(name = "registry")
+@Builder
+public class Registry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne
     private Model model;
 
-    @Column(name = "count")
-    private int count;
+    @Column(name = "inv_number")
+    private String invNumber;
 
-    @Column(name = "sum")
-    private double sum;
+    @ManyToOne
+    private Location location;
+
+    @ManyToOne
+    private User user;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "parent_id")
-    private List<IncomeSub> children;
+    private List<Registry> children;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "registry_id")
+    private List<History> histories;
+
+    @Column(name = "global_id")
+    private String globalId;
 
     @Column(name = "created_at", updatable=false)
     @CreationTimestamp
@@ -43,8 +57,5 @@ public class IncomeSub {
     @Column(name = "update_at")
     @UpdateTimestamp
     private LocalDateTime updateAt;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
 }

@@ -3,35 +3,29 @@ package ru.moore.AISUchetTehniki.models.Entity.doc;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.Where;
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.moore.AISUchetTehniki.models.Entity.spr.User;
 import ru.moore.AISUchetTehniki.models.Entity.spr.Counterparty;
-import ru.moore.AISUchetTehniki.repositories.doc.IncomeMainRepository;
-import ru.moore.AISUchetTehniki.repositories.doc.IncomeSubRepository;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "DOC_INCOME_MAIN")
-public class IncomeMain implements Serializable {
+public class IncomeMain {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "native")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
     @Column(name = "executed")
-    private Boolean executed;
+    private Boolean executed = false;
 
     @Column(name = "data_executed")
     private Date dataExecuted;
@@ -52,12 +46,11 @@ public class IncomeMain implements Serializable {
     private Date dataCon;
 
     @ManyToOne
-    @JoinColumn(name = "counterparty_id")
     private Counterparty counterparty;
 
-    ////    @OrderBy(value = "model asc")
-    @OneToMany(mappedBy = "docMain", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @Where(clause = "parent_id is null")
+    @OrderBy(value = "id desc")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "main_id")
     private List<IncomeSub> docSubs;
 
     @Column(name = "global_id")
