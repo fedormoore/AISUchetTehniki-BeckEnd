@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    List<User> findAllByGlobalId(String globalId);
+    List<User> findAllByGlobalIdOrderByLastNameAsc(String globalId);
 
 }

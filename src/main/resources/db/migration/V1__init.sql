@@ -187,41 +187,68 @@ CREATE TABLE IF NOT EXISTS DOC_INCOME_SUB
 
 CREATE TABLE IF NOT EXISTS REGISTRY
 (
-    id             bigserial    not null
+    id          bigserial    not null
         constraint registry_table_pk primary key,
 
-    model_id       bigint       not null REFERENCES SPR_MODEL (id),
-    inv_number     VARCHAR(50),
-    location_id    bigint REFERENCES SPR_LOCATION (id),
-    user_id    bigint REFERENCES SPR_USERS (id),--сотрудник
+    model_id    bigint       not null REFERENCES SPR_MODEL (id),
+    inv_number  VARCHAR(50),
+    location_id bigint REFERENCES SPR_LOCATION (id),
+    user_id     bigint REFERENCES SPR_USERS (id),--сотрудник
 --     responsible_id bigint REFERENCES SPR_USERS (id),--материально ответственное лицо
-    parent_id      bigint REFERENCES REGISTRY (id),
+    parent_id   bigint REFERENCES REGISTRY (id),
 
-    global_id      VARCHAR(500) not null,
-    created_at     timestamp default current_timestamp,
-    update_at      timestamp default current_timestamp
+    global_id   VARCHAR(500) not null,
+    created_at  timestamp default current_timestamp,
+    update_at   timestamp default current_timestamp
 );
 
 CREATE OR REPLACE FUNCTION registry_stamp()
     RETURNS TRIGGER
     LANGUAGE plpgsql
-AS $$
+AS
+$$
 BEGIN
 
-        IF OLD.inv_number is null THEN
-            IF NEW.inv_number is not null THEN
-            INSERT INTO REGISTRY_HISTORY (registry_id, text) VALUES (NEW.id, 'Присвоили инвентарный номер ' || NEW.inv_number);
-            END IF;
+    IF OLD.inv_number is null THEN
+        IF NEW.inv_number is not null THEN
+            INSERT INTO REGISTRY_HISTORY (registry_id, global_id, type_record, new_value)
+            VALUES (NEW.id, NEW.global_id, 'invNumber', NEW.inv_number);
         END IF;
-        IF NEW.inv_number <> OLD.inv_number THEN
-            INSERT INTO REGISTRY_HISTORY (registry_id, text) VALUES (NEW.id, 'Изменили инвентарный номер с ' || OLD.inv_number || ' на ' || NEW.inv_number);
+    END IF;
+    IF NEW.inv_number <> OLD.inv_number THEN
+        INSERT INTO REGISTRY_HISTORY (registry_id, global_id, type_record, old_value, new_value)
+        VALUES (NEW.id, NEW.global_id, 'invNumber', OLD.inv_number, NEW.inv_number);
+    END IF;
+
+    IF OLD.location_id is null THEN
+        IF NEW.location_id is not null THEN
+            INSERT INTO REGISTRY_HISTORY (registry_id, global_id, type_record, new_value)
+            VALUES (NEW.id, NEW.global_id, 'Location', NEW.location_id);
         END IF;
+    END IF;
+    IF NEW.location_id <> OLD.location_id THEN
+        INSERT INTO REGISTRY_HISTORY (registry_id, global_id, type_record, old_value, new_value)
+        VALUES (NEW.id, NEW.global_id, 'Location', OLD.location_id, NEW.location_id);
+    END IF;
+
+    IF OLD.user_id is null THEN
+        IF NEW.user_id is not null THEN
+            INSERT INTO REGISTRY_HISTORY (registry_id, global_id, type_record, new_value)
+            VALUES (NEW.id, NEW.global_id, 'User', NEW.user_id);
+        END IF;
+    END IF;
+    IF NEW.user_id <> OLD.user_id THEN
+        INSERT INTO REGISTRY_HISTORY (registry_id, global_id, type_record, old_value, new_value)
+        VALUES (NEW.id, NEW.global_id, 'User', OLD.user_id, NEW.user_id);
+    END IF;
 
     RETURN NEW;
-END;
+END ;
 $$;
 
-CREATE TRIGGER registry_stamp BEFORE UPDATE ON registry
+CREATE TRIGGER registry_stamp
+    BEFORE UPDATE
+    ON registry
     FOR EACH ROW
 EXECUTE PROCEDURE registry_stamp();
 
@@ -298,9 +325,12 @@ EXECUTE PROCEDURE registry_stamp();
 
 CREATE TABLE IF NOT EXISTS REGISTRY_HISTORY
 (
-    id          bigserial not null
+    id          bigserial    not null
         constraint history_device_table_pk primary key,
+    global_id   VARCHAR(500) not null,
     registry_id bigint REFERENCES REGISTRY (id),
-    text        VARCHAR(500),
+    type_record VARCHAR(50),
+    old_value   VARCHAR(50),
+    new_value   VARCHAR(50),
     created_at  timestamp default current_timestamp
 );

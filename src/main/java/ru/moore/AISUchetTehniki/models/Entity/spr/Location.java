@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
+import ru.moore.AISUchetTehniki.models.Entity.Registry;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -40,9 +41,6 @@ public class Location {
 
     @Column(name = "global_id")
     private String globalId;
-
-    @OneToMany(mappedBy = "location")
-    private List<User> user;
 
     @Column(name = "created_at", updatable=false)
     @CreationTimestamp

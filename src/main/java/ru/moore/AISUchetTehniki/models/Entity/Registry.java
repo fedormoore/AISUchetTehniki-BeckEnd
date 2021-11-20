@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 import ru.moore.AISUchetTehniki.models.Entity.spr.Location;
 import ru.moore.AISUchetTehniki.models.Entity.spr.Model;
@@ -19,7 +20,6 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "registry")
-@Builder
 public class Registry {
 
     @Id
@@ -39,11 +39,11 @@ public class Registry {
     @ManyToOne
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany( cascade = CascadeType.ALL)
     @JoinColumn(name = "parent_id")
     private List<Registry> children;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "registry_id")
     private List<History> histories;
 

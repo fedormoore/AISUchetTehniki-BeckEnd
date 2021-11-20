@@ -57,6 +57,7 @@ public class DocService {
     public IncomeMainResponseDto saveIncomeMain(Authentication authentication, IncomeMainRequestDto incomeMainRequestDto) {
         IncomeMain incomeMain = mapperUtils.map(incomeMainRequestDto, IncomeMain.class);
         incomeMain.setGlobalId(getGlobalId(authentication));
+        Long incomeMainId = incomeMainRepository.save(incomeMain).getId();
 
         if (incomeMain.getExecuted()) {
             for (IncomeSub docSub : incomeMain.getDocSubs()) {
@@ -69,9 +70,10 @@ public class DocService {
                 }
 
                 List<History> historyList = new ArrayList<>();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
                 History history = History.builder()
-                        .text("Поступление. Основание № " + incomeMain.getNumberDoc() + " дата " + dateFormat.format(incomeMain.getDataDoc()))
+                        .typeRecord("IncomeDoc")
+                        .newValue(incomeMainId)
+                        .globalId(getGlobalId(authentication))
                         .build();
                 historyList.add(history);
 
@@ -84,7 +86,7 @@ public class DocService {
         }
 
         try {
-            return mapperUtils.map(incomeMainRepository.save(incomeMain), IncomeMainResponseDto.class);
+            return mapperUtils.map(incomeMainRepository.findById(incomeMainId).get(), IncomeMainResponseDto.class);
         } catch (DataIntegrityViolationException ex) {
             throw new ErrorTemplate(HttpStatus.BAD_REQUEST, Objects.requireNonNull(ex.getRootCause()).getMessage());
         }

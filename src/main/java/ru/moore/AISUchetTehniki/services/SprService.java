@@ -59,7 +59,7 @@ public class SprService {
     }
 
     public List<UserResponseDto> getAllUser(Authentication authentication) {
-        return mapperUtils.mapAll(userRepository.findAllByGlobalId(getGlobalId(authentication)), UserResponseDto.class);
+        return mapperUtils.mapAll(userRepository.findAllByGlobalIdOrderByLastNameAsc(getGlobalId(authentication)), UserResponseDto.class);
     }
 
     public UserResponseDto saveUser(Authentication authentication, UserRequestDto userRequstDto) {

@@ -25,10 +25,19 @@ public class History {
     private Long id;
 
     @Column(name = "registry_id")
-    private Long registry_id;
+    private Long registryId;
 
-    @Column(name = "text")
-    private String text;
+    @Column(name = "type_record")
+    private String typeRecord;
+
+    @Column(name = "old_value")
+    private Long oldValue;
+
+    @Column(name = "new_value")
+    private Long newValue;
+
+    @Column(name = "global_id")
+    private String globalId;
 
     @Column(name = "created_at")
     @CreationTimestamp

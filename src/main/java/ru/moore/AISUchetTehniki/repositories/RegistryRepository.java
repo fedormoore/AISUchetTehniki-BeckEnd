@@ -8,4 +8,6 @@ import java.util.List;
 public interface RegistryRepository extends JpaRepository<Registry, Long> {
 
     List<Registry> findAllByGlobalIdOrderByIdAsc(String globalId);
+
+
 }

@@ -9,8 +9,10 @@ import ru.moore.AISUchetTehniki.exeptions.ErrorTemplate;
 import ru.moore.AISUchetTehniki.models.Dto.RegistryRequestDto;
 import ru.moore.AISUchetTehniki.models.Dto.RegistryResponseDto;
 import ru.moore.AISUchetTehniki.models.Dto.spr.response.UserResponseDto;
+import ru.moore.AISUchetTehniki.models.Entity.History;
 import ru.moore.AISUchetTehniki.models.Entity.Registry;
 import ru.moore.AISUchetTehniki.models.Entity.spr.User;
+import ru.moore.AISUchetTehniki.repositories.HistoryRepository;
 import ru.moore.AISUchetTehniki.repositories.RegistryRepository;
 import ru.moore.AISUchetTehniki.security.UserPrincipal;
 import ru.moore.AISUchetTehniki.services.mappers.MapperUtils;
@@ -24,6 +26,7 @@ import java.util.Objects;
 public class RegistryService {
 
     private final RegistryRepository registryRepository;
+    private final HistoryRepository historyRepository;
     private final MapperUtils mapperUtils;
 
     private String getGlobalId(Authentication authentication) {
@@ -40,8 +43,7 @@ public class RegistryService {
     public RegistryResponseDto saveRegistry(Authentication authentication, RegistryRequestDto registryRequestDto) {
         Registry registry = mapperUtils.map(registryRequestDto, Registry.class);
         registry.setGlobalId(getGlobalId(authentication));
-        registry.setHistories(null);
-
+        registry.setHistories(historyRepository.findAllByRegistryId(registry.getId()));
         try {
             return mapperUtils.map(registryRepository.save(registry), RegistryResponseDto.class);
         } catch (DataIntegrityViolationException ex) {
