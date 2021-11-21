@@ -143,6 +143,23 @@ CREATE TABLE IF NOT EXISTS SPR_COUNTERPARTY
     UNIQUE (name, global_id)
 );
 
+CREATE TABLE IF NOT EXISTS spr_budget_account
+(
+    id         bigserial    not null
+        constraint spr_budget_account_table_pk primary key,
+
+    code       VARCHAR(10) NOT NULL,
+    name       VARCHAR(255) NOT NULL,
+
+    global_id  VARCHAR(500) NOT NULL,
+    created_at timestamp default current_timestamp,
+    update_at  timestamp default current_timestamp,
+    deleted_at timestamp,
+    deleted    BOOLEAN   DEFAULT false,
+
+    UNIQUE (code, name, global_id)
+);
+
 CREATE TABLE IF NOT EXISTS DOC_INCOME_MAIN
 (
     id              bigserial      not null
@@ -194,6 +211,7 @@ CREATE TABLE IF NOT EXISTS REGISTRY
     inv_number  VARCHAR(50),
     location_id bigint REFERENCES SPR_LOCATION (id),
     user_id     bigint REFERENCES SPR_USERS (id),--сотрудник
+    budget_account_id   bigint REFERENCES spr_budget_account (id),--учетный счет бюджета
 --     responsible_id bigint REFERENCES SPR_USERS (id),--материально ответственное лицо
     parent_id   bigint REFERENCES REGISTRY (id),
 
@@ -240,6 +258,17 @@ BEGIN
     IF NEW.user_id <> OLD.user_id THEN
         INSERT INTO REGISTRY_HISTORY (registry_id, global_id, type_record, old_value, new_value)
         VALUES (NEW.id, NEW.global_id, 'User', OLD.user_id, NEW.user_id);
+    END IF;
+
+    IF OLD.budget_account_id is null THEN
+        IF NEW.budget_account_id is not null THEN
+            INSERT INTO REGISTRY_HISTORY (registry_id, global_id, type_record, new_value)
+            VALUES (NEW.id, NEW.global_id, 'BudgetAccount', NEW.budget_account_id);
+        END IF;
+    END IF;
+    IF NEW.budget_account_id <> OLD.budget_account_id THEN
+        INSERT INTO REGISTRY_HISTORY (registry_id, global_id, type_record, old_value, new_value)
+        VALUES (NEW.id, NEW.global_id, 'BudgetAccount', OLD.budget_account_id, NEW.budget_account_id);
     END IF;
 
     RETURN NEW;

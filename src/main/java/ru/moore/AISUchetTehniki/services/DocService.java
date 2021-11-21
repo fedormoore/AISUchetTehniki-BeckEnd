@@ -62,24 +62,24 @@ public class DocService {
         if (incomeMain.getExecuted()) {
             for (IncomeSub docSub : incomeMain.getDocSubs()) {
 
-                Registry registry = mapperUtils.map(docSub, Registry.class);
-                registry.setGlobalId(getGlobalId(authentication));
-
-                if (docSub.getChildren() != null) {
-                    registry.setChildren(insertRegistry(getGlobalId(authentication), docSub.getChildren()));
-                }
-
-                List<History> historyList = new ArrayList<>();
-                History history = History.builder()
-                        .typeRecord("IncomeDoc")
-                        .newValue(incomeMainId)
-                        .globalId(getGlobalId(authentication))
-                        .build();
-                historyList.add(history);
-
-                registry.setHistories(historyList);
-
                 for (int i = 0; i < docSub.getCount(); i++) {
+                    Registry registry = mapperUtils.map(docSub, Registry.class);
+                    registry.setGlobalId(getGlobalId(authentication));
+
+                    if (docSub.getChildren() != null) {
+                        registry.setChildren(insertRegistry(getGlobalId(authentication), docSub.getChildren()));
+                    }
+
+                    List<History> historyList = new ArrayList<>();
+                    History history = History.builder()
+                            .typeRecord("IncomeDoc")
+                            .newValue(incomeMainId)
+                            .globalId(getGlobalId(authentication))
+                            .build();
+                    historyList.add(history);
+
+                    registry.setHistories(historyList);
+
                     registryRepository.save(registry);
                 }
             }

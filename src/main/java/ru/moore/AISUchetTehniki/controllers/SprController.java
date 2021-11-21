@@ -90,4 +90,15 @@ public class SprController {
         return sprService.saveCounterparty(authentication, counterparty);
     }
 
+    @GetMapping("/budget_account")
+    public List<BudgetAccountResponseDto> getAllBudgetAccount(Authentication authentication) {
+        return sprService.getAllBudgetAccount(authentication);
+    }
+
+    @PostMapping("/budget_account")
+    @ResponseStatus(HttpStatus.CREATED)
+    public BudgetAccountResponseDto saveBudgetAccount(Authentication authentication, @Valid @RequestBody BudgetAccountRequestDto budgetAccountRequestDto) {
+        return sprService.saveBudgetAccount(authentication, budgetAccountRequestDto);
+    }
+
 }

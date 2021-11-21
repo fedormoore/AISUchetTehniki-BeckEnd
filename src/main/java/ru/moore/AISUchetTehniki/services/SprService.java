@@ -28,6 +28,7 @@ public class SprService {
     private final FirmRepository firmRepository;
     private final ModelRepository modelRepository;
     private final CounterpartyRepository providerRepository;
+    private final BudgetAccountRepository budgetAccountRepository;
     private final MapperUtils mapperUtils;
 
     private String getGlobalId(Authentication authentication) {
@@ -144,6 +145,24 @@ public class SprService {
 
         try {
             return mapperUtils.map(providerRepository.save(counterparty), CounterpartyResponseDto.class);
+        } catch (DataIntegrityViolationException ex) {
+            if (((SQLException) ex.getMostSpecificCause()).getSQLState().equals("23505")) {
+                throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");
+            }
+            throw new ErrorTemplate(HttpStatus.BAD_REQUEST, Objects.requireNonNull(ex.getRootCause()).getMessage());
+        }
+    }
+
+    public List<BudgetAccountResponseDto> getAllBudgetAccount(Authentication authentication) {
+        return mapperUtils.mapAll(budgetAccountRepository.findAllByGlobalIdOrderByCodeAsc(getGlobalId(authentication)), BudgetAccountResponseDto.class);
+    }
+
+    public BudgetAccountResponseDto saveBudgetAccount(Authentication authentication, BudgetAccountRequestDto budgetAccountRequestDto) {
+        BudgetAccount budgetAccountRequest = mapperUtils.map(budgetAccountRequestDto, BudgetAccount.class);
+        budgetAccountRequest.setGlobalId(getGlobalId(authentication));
+
+        try {
+            return mapperUtils.map(budgetAccountRepository.save(budgetAccountRequest), BudgetAccountResponseDto.class);
         } catch (DataIntegrityViolationException ex) {
             if (((SQLException) ex.getMostSpecificCause()).getSQLState().equals("23505")) {
                 throw new ErrorTemplate(HttpStatus.BAD_REQUEST, "Запись уже существует!");

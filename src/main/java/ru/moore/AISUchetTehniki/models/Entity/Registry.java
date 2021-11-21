@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
+import ru.moore.AISUchetTehniki.models.Entity.spr.BudgetAccount;
 import ru.moore.AISUchetTehniki.models.Entity.spr.Location;
 import ru.moore.AISUchetTehniki.models.Entity.spr.Model;
 import ru.moore.AISUchetTehniki.models.Entity.spr.User;
@@ -38,6 +39,9 @@ public class Registry {
 
     @ManyToOne
     private User user;
+
+    @ManyToOne
+    private BudgetAccount budgetAccount;
 
     @OneToMany( cascade = CascadeType.ALL)
     @JoinColumn(name = "parent_id")
