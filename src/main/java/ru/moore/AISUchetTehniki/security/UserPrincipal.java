@@ -13,5 +13,5 @@ public class UserPrincipal {
 
     private Long id;
     private String globalId;
-
+    private String email;
 }

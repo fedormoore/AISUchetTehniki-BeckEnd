@@ -1,6 +1,7 @@
 package ru.moore.AISUchetTehniki.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.moore.AISUchetTehniki.exeptions.TemplateMessage;
+import ru.moore.AISUchetTehniki.models.Entity.Account;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -25,32 +27,30 @@ import java.util.List;
 @Slf4j
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtProvider jwtProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String jwt = getJwtFromRequest(request);
-            UserPrincipal user = null;
+            final String token = getJwtFromRequest(request);
+        if (token != null && jwtProvider.validateAccessToken(token)) {
+            final Claims claims = jwtProvider.getAccessClaims(token);
+            ObjectMapper mapper = new ObjectMapper();
+            UserPrincipal user = mapper.convertValue(claims.get("user"), UserPrincipal.class);
 
-            if (StringUtils.hasText(jwt)) {
-                jwtTokenUtil.validateToken(jwt);
-                user = jwtTokenUtil.getUserFromToken(jwt);
-
-                List<GrantedAuthority> authorities = new ArrayList<>();
-                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, null, authorities);
-                SecurityContextHolder.getContext().setAuthentication(token);
-            }
-        } catch (Exception ex) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            TemplateMessage templateError = new TemplateMessage(HttpStatus.UNAUTHORIZED.value(), "Ошбика", ex.getMessage());
-
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.setCharacterEncoding("utf-8");
-            response.getWriter().write(objectMapper.writeValueAsString(templateError));
-            return;
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }
+    } catch (Exception ex) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        TemplateMessage templateError = new TemplateMessage(HttpStatus.UNAUTHORIZED.value(), "Ошбика", ex.getMessage());
 
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setCharacterEncoding("utf-8");
+        response.getWriter().write(objectMapper.writeValueAsString(templateError));
+        return;
+    }
         filterChain.doFilter(request, response);
 
     }
@@ -58,7 +58,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7, bearerToken.length());
+            return bearerToken.substring(7);
         }
         return null;
     }

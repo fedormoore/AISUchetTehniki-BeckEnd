@@ -21,6 +21,16 @@ CREATE TABLE IF NOT EXISTS accounts
     deleted           BOOLEAN   DEFAULT false
 );
 
+CREATE TABLE refresh_token
+(
+    id          bigserial    not null
+        constraint refresh_token_table_pk primary key,
+    user_id     bigint REFERENCES accounts (id) ON DELETE CASCADE,
+    token       VARCHAR(200) NOT NULL,
+    expiry_date bigint       NOT NULL,
+    created_at  timestamp default current_timestamp
+);
+
 CREATE TABLE IF NOT EXISTS SPR_ORGANIZATION
 (
     id         bigserial    not null
@@ -148,7 +158,7 @@ CREATE TABLE IF NOT EXISTS spr_budget_account
     id         bigserial    not null
         constraint spr_budget_account_table_pk primary key,
 
-    code       VARCHAR(10) NOT NULL,
+    code       VARCHAR(10)  NOT NULL,
     name       VARCHAR(255) NOT NULL,
 
     global_id  VARCHAR(500) NOT NULL,
@@ -204,20 +214,20 @@ CREATE TABLE IF NOT EXISTS DOC_INCOME_SUB
 
 CREATE TABLE IF NOT EXISTS REGISTRY
 (
-    id          bigserial    not null
+    id                bigserial    not null
         constraint registry_table_pk primary key,
 
-    model_id    bigint       not null REFERENCES SPR_MODEL (id),
-    inv_number  VARCHAR(50),
-    location_id bigint REFERENCES SPR_LOCATION (id),
-    user_id     bigint REFERENCES SPR_USERS (id),--сотрудник
-    budget_account_id   bigint REFERENCES spr_budget_account (id),--учетный счет бюджета
+    model_id          bigint       not null REFERENCES SPR_MODEL (id),
+    inv_number        VARCHAR(50),
+    location_id       bigint REFERENCES SPR_LOCATION (id),
+    user_id           bigint REFERENCES SPR_USERS (id),--сотрудник
+    budget_account_id bigint REFERENCES spr_budget_account (id),--учетный счет бюджета
 --     responsible_id bigint REFERENCES SPR_USERS (id),--материально ответственное лицо
-    parent_id   bigint REFERENCES REGISTRY (id),
+    parent_id         bigint REFERENCES REGISTRY (id),
 
-    global_id   VARCHAR(500) not null,
-    created_at  timestamp default current_timestamp,
-    update_at   timestamp default current_timestamp
+    global_id         VARCHAR(500) not null,
+    created_at        timestamp default current_timestamp,
+    update_at         timestamp default current_timestamp
 );
 
 CREATE OR REPLACE FUNCTION registry_stamp()

@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 import ru.moore.AISUchetTehniki.models.Entity.Account;
-import ru.moore.AISUchetTehniki.security.SignInDto;
+import ru.moore.AISUchetTehniki.security.dto.JwtRequest;
+import ru.moore.AISUchetTehniki.security.dto.JwtResponse;
+import ru.moore.AISUchetTehniki.security.dto.RefreshJwtRequest;
 import ru.moore.AISUchetTehniki.services.AuthService;
 
 import javax.validation.Valid;
@@ -16,16 +18,16 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService userService;
+    private final AuthService authService;
 
     @PostMapping("/signUp")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody Account signUp) {
-        return userService.registerUser(signUp);
+    public ResponseEntity<?> signUp(@Valid @RequestBody Account signUp) {
+        return authService.registerUser(signUp);
     }
 
     @GetMapping("/activate/{code}")
     public RedirectView activate(@PathVariable String code) {
-        boolean isActivated = userService.activateUser(code);
+        boolean isActivated = authService.activateUser(code);
 
         if (isActivated) {
             //model.addAttribute("message", "User successfully activated");
@@ -36,9 +38,15 @@ public class AuthController {
         return new RedirectView("http://localhost:3000/login");
     }
 
+    @PostMapping("/refresh-tokens")
+    public ResponseEntity<?> refreshTokens(@RequestBody RefreshJwtRequest request) {
+        final JwtResponse token = authService.getAccessToken(request.getRefreshToken());
+        return ResponseEntity.ok(token);
+    }
+
     @PostMapping("/signIn")
-    public ResponseEntity<?> loginUser(@RequestBody SignInDto signIn) {
-        return userService.loginUser(signIn.getEmail(), signIn.getPassword());
+    public ResponseEntity<?> signIn(@RequestBody JwtRequest signIn) {
+        return authService.loginUser(signIn.getLogin(), signIn.getPassword());
     }
 
 }
