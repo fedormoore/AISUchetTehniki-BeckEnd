@@ -35,7 +35,7 @@ public class JwtProvider {
                 .build();
 
         final LocalDateTime now = LocalDateTime.now();
-        final Instant accessExpirationInstant = now.plusSeconds(5).atZone(ZoneId.systemDefault()).toInstant();
+        final Instant accessExpirationInstant = now.plusHours(1).atZone(ZoneId.systemDefault()).toInstant();
         final Date accessExpiration = Date.from(accessExpirationInstant);
 
         final String accessToken = Jwts.builder()
