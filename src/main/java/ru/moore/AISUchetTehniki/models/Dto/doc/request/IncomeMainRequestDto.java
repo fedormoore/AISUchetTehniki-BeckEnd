@@ -2,7 +2,6 @@ package ru.moore.AISUchetTehniki.models.Dto.doc.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.moore.AISUchetTehniki.models.Dto.doc.response.IncomeSubResponseDto;
 import ru.moore.AISUchetTehniki.models.Dto.spr.response.CounterpartyResponseDto;
 
 import java.util.Date;

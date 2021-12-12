@@ -20,7 +20,8 @@ public class CustomControllerAdvice {
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage()));
         ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, errors.toString());
-        return new ResponseEntity(error,HttpStatus.BAD_REQUEST);
+        final ResponseEntity responseEntity = new ResponseEntity(error, HttpStatus.BAD_REQUEST);
+        return responseEntity;
     }
 
     @ExceptionHandler

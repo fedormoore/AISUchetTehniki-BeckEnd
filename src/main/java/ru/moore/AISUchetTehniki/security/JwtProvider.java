@@ -38,14 +38,13 @@ public class JwtProvider {
         final Instant accessExpirationInstant = now.plusHours(1).atZone(ZoneId.systemDefault()).toInstant();
         final Date accessExpiration = Date.from(accessExpirationInstant);
 
-        final String accessToken = Jwts.builder()
+        return Jwts.builder()
                 .claim("user", userPrincipal)
 //                .setSubject(userPrincipal.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(accessExpiration)
                 .signWith(SignatureAlgorithm.HS256, jwtAccessSecret)
                 .compact();
-        return accessToken;
     }
 
     public String generateRefreshToken(Account account) {
@@ -59,12 +58,11 @@ public class JwtProvider {
         final LocalDateTime now = LocalDateTime.now();
         final Instant refreshExpirationInstant = now.plusDays(1).atZone(ZoneId.systemDefault()).toInstant();
         final Date refreshExpiration = Date.from(refreshExpirationInstant);
-        final String refreshToken = Jwts.builder()
+        return Jwts.builder()
                 .claim("user", userPrincipal)
                 .setExpiration(refreshExpiration)
                 .signWith(SignatureAlgorithm.HS512, jwtRefreshSecret)
                 .compact();
-        return refreshToken;
     }
 
     public boolean validateAccessToken(@NonNull String token) {
@@ -85,7 +83,8 @@ public class JwtProvider {
         } catch (UnsupportedJwtException unsEx) {
             logger.error("Unsupported jwt", unsEx);
         } catch (MalformedJwtException mjEx) {
-            logger.error("Malformed jwt", mjEx);
+//            logger.error("Malformed jwt", mjEx);
+            throw new ErrorTemplate(HttpStatus.UNAUTHORIZED, "Не верный JWT");
         } catch (SignatureException sEx) {
             logger.error("Invalid signature", sEx);
         } catch (Exception e) {

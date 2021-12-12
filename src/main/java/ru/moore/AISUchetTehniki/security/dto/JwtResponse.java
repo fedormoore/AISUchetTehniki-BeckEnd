@@ -1,7 +1,6 @@
 package ru.moore.AISUchetTehniki.security.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 @Getter
@@ -9,7 +8,7 @@ import lombok.Getter;
 public class JwtResponse {
 
     private final String type = "Bearer";
-    private String accessToken;
-    private String refreshToken;
+    private final String accessToken;
+    private final String refreshToken;
 
 }

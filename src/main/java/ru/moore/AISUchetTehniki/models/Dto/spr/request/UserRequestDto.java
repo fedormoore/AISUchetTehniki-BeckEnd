@@ -2,9 +2,7 @@ package ru.moore.AISUchetTehniki.models.Dto.spr.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.moore.AISUchetTehniki.models.Dto.spr.OrganizationDto;
 import ru.moore.AISUchetTehniki.models.Dto.spr.response.LocationResponseDto;
-import ru.moore.AISUchetTehniki.models.Entity.spr.Location;
 import ru.moore.AISUchetTehniki.models.Entity.spr.Organization;
 
 import javax.validation.constraints.Email;

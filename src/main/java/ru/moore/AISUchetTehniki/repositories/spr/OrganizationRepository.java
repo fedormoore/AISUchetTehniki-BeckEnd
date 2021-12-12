@@ -7,5 +7,5 @@ import ru.moore.AISUchetTehniki.models.Entity.spr.Organization;
 @Repository
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
 
-    boolean existsByName(String name);
+//    boolean existsByName(String name);
 }

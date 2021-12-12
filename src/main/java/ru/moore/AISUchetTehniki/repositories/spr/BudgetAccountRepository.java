@@ -3,7 +3,6 @@ package ru.moore.AISUchetTehniki.repositories.spr;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.moore.AISUchetTehniki.models.Entity.spr.BudgetAccount;
-import ru.moore.AISUchetTehniki.models.Entity.spr.User;
 
 import java.util.List;
 

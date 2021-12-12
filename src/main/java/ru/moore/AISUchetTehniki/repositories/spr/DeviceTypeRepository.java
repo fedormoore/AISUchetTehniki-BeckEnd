@@ -5,12 +5,11 @@ import org.springframework.stereotype.Repository;
 import ru.moore.AISUchetTehniki.models.Entity.spr.DeviceType;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface DeviceTypeRepository extends JpaRepository<DeviceType, Long> {
 
-    Optional<DeviceType> findByName(String name);
+//    Optional<DeviceType> findByName(String name);
 
     List<DeviceType> findAllByLevelOrGlobalIdOrderByNameAsc(String global, String globalId);
 }

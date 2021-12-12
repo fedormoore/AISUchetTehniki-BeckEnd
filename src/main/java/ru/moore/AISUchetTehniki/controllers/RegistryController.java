@@ -5,10 +5,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.moore.AISUchetTehniki.models.Dto.RegistryRequestDto;
 import ru.moore.AISUchetTehniki.models.Dto.RegistryResponseDto;
-import ru.moore.AISUchetTehniki.models.Dto.spr.request.LocationRequestDto;
 import ru.moore.AISUchetTehniki.services.RegistryService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @CrossOrigin(origins = {"*"})

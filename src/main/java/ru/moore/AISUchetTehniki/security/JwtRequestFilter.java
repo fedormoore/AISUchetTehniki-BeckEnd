@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.moore.AISUchetTehniki.exeptions.TemplateMessage;
-import ru.moore.AISUchetTehniki.models.Entity.Account;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

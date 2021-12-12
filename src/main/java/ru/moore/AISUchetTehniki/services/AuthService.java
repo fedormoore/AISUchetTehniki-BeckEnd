@@ -20,9 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.moore.AISUchetTehniki.exeptions.ErrorTemplate;
 import ru.moore.AISUchetTehniki.models.Entity.Account;
 import ru.moore.AISUchetTehniki.repositories.AccountRepository;
-import ru.moore.AISUchetTehniki.security.UserPrincipal;
-import ru.moore.AISUchetTehniki.security.dto.JwtResponse;
 import ru.moore.AISUchetTehniki.security.JwtProvider;
+import ru.moore.AISUchetTehniki.security.dto.JwtResponse;
 import ru.moore.AISUchetTehniki.services.mappers.MapperUtils;
 import ru.moore.AISUchetTehniki.utils.MailSender;
 

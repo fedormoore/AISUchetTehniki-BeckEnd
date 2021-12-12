@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.moore.AISUchetTehniki.models.Dto.HistoryResponseDto;
-import ru.moore.AISUchetTehniki.models.Dto.RegistryRequestDto;
-import ru.moore.AISUchetTehniki.models.Dto.RegistryResponseDto;
 import ru.moore.AISUchetTehniki.services.HistoryService;
-import ru.moore.AISUchetTehniki.services.RegistryService;
 
 import java.util.List;
 
