@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "spr_location")
+@Where(clause = "deleted = false")
 public class LocationParent {
 
     @Id
@@ -46,6 +48,6 @@ public class LocationParent {
     private LocalDateTime deletedAt;
 
     @Column(name = "deleted")
-    private boolean deleted;
+    private boolean deleted = Boolean.FALSE;
 
 }

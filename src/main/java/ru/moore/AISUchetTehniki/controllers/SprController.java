@@ -2,6 +2,7 @@ package ru.moore.AISUchetTehniki.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.moore.AISUchetTehniki.models.Dto.spr.request.*;
@@ -28,6 +29,12 @@ public class SprController {
     @ResponseStatus(HttpStatus.CREATED)
     public List<LocationResponseDto> saveAddress(Authentication authentication, @Valid @RequestBody LocationRequestDto location) {
         return sprService.saveLocation(authentication, location);
+    }
+
+    @DeleteMapping("/location")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> deleteAddress(Authentication authentication, @RequestBody LocationDeleteRequestDto location) {
+        return sprService.deleteLocation(authentication, location);
     }
 
     @GetMapping("/user")

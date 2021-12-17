@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 public class FirmResponseDto {
 
     private Long id;
-
     private String name;
-
     private String level;
 
 }

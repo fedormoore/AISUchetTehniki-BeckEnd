@@ -3,12 +3,12 @@ package ru.moore.AISUchetTehniki.models.Entity.spr;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.Where;
-import ru.moore.AISUchetTehniki.models.Entity.Registry;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,6 +17,10 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "spr_location")
+//@FilterDef(name = "authorize", parameters = {@ParamDef(name = "globalId", type = "string")})
+//@Filters({
+//        @Filter(name = "authorize", condition = "global_id = :globalId and deleted = false")
+//})
 public class Location {
 
     @Id
@@ -31,18 +35,24 @@ public class Location {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name="parent")
+    @JoinColumn(name = "parent")
     private LocationParent parent;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
-//    @Where(clause = "parent is null")
     @OrderBy(value = "name asc")
+//    //фильтр по целевой таблице сущностей
+//    @Filter(name="betweenLength", condition=":minLength <= length and :maxLength >= length")
+//    //фильтр по таблице ассоциаций
+//    @FilterJoinTable(name="authorize", condition = "global_id = :globalId and deleted = false")
+//    @Filters({
+//            @Filter(name = "authorize", condition = "global_id = :globalId and deleted = false")
+//    })
     private List<Location> children;
 
     @Column(name = "global_id")
     private String globalId;
 
-    @Column(name = "created_at", updatable=false)
+    @Column(name = "created_at", updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -54,6 +64,6 @@ public class Location {
     private LocalDateTime deletedAt;
 
     @Column(name = "deleted")
-    private boolean deleted;
+    private boolean deleted = Boolean.FALSE;
 
 }

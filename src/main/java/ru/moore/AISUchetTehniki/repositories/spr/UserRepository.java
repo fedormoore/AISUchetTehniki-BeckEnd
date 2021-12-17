@@ -11,4 +11,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findAllByGlobalIdOrderByLastNameAsc(String globalId);
 
+    List<User> findAllByLocationId(Long id);
 }

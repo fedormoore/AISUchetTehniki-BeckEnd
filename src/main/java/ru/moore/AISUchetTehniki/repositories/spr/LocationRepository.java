@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface LocationRepository extends JpaRepository<Location, Long> {
 
-    List<Location> findAllByTypeAndGlobalIdOrderByNameDesc(String type, String globalId);
+    List<Location> findAllByTypeOrderByNameDesc(String type);
 
 }

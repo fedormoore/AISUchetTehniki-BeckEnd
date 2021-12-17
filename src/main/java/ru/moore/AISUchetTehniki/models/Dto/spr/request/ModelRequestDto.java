@@ -17,4 +17,5 @@ public class ModelRequestDto {
     private DeviceTypeRequestDto deviceType;
 
     private FirmRequestDto firm;
+
 }

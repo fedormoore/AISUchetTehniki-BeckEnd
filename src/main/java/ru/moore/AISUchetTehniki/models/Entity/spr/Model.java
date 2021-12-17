@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 import ru.moore.AISUchetTehniki.models.Entity.doc.IncomeSub;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "spr_model")
+@Where(clause = "deleted = false")
 public class Model {
 
     @Id
